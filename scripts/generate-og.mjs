@@ -1,26 +1,26 @@
 /**
- * Generates image assets from the source portrait (src/assets/portrait.webp):
+ * Generates the site's raster/vector brand assets:
  *
- *   src/assets/avatar-face.jpg   tight face crop → header logo (optimised by Astro at build)
- *   src/assets/avatar-bust.jpg   head-and-shoulders crop → hero portrait
- *   public/favicon-32.png        circular favicon
- *   public/favicon-192.png       circular icon for Android / manifest use
- *   public/apple-touch-icon.png  square 180×180 home-screen icon
- *   public/og.png                1200×630 social preview card
+ *   public/favicon.svg           logo mark (crisp at any size)
+ *   public/favicon-32.png        logo mark, PNG fallback
+ *   public/favicon-192.png       logo mark for Android / manifest use
+ *   public/apple-touch-icon.png  logo mark, 180×180 home-screen icon
+ *   src/assets/avatar-bust.jpg   head-and-shoulders crop of the portrait → hero
+ *   public/og.png                1200×630 social preview card (with portrait)
  *
  * Run with `npm run og` after replacing the portrait or changing your name,
  * headline or colours. Outputs are committed, so this never runs on deploy.
  *
- * Crops are in source-image pixels (portrait is 1254×1254). Adjust them if
- * you swap in a different photo.
+ * The portrait crop is in source-image pixels (portrait is 1254×1254).
+ * Adjust BUST if you swap in a different photo.
  */
 import sharp from 'sharp';
+import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const path = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
 const source = path('src/assets/portrait.webp');
 
-const FACE = { left: 418, top: 165, width: 500, height: 500 };
 const BUST = { left: 225, top: 110, width: 880, height: 880 };
 
 const crop = (box) => sharp(source).extract(box);
@@ -37,15 +37,27 @@ async function circle(box, size) {
     .toBuffer();
 }
 
-// Source crops for the site (Astro resizes these and converts them to WebP/AVIF).
-await crop(FACE).resize(320).jpeg({ quality: 88, mozjpeg: true }).toFile(path('src/assets/avatar-face.jpg'));
+// Hero portrait source (Astro resizes it and converts it to WebP at build).
 await crop(BUST).resize(640).jpeg({ quality: 86, mozjpeg: true }).toFile(path('src/assets/avatar-bust.jpg'));
 
-// Icons
-await sharp(await circle(FACE, 32)).toFile(path('public/favicon-32.png'));
-await sharp(await circle(FACE, 192)).png({ palette: true, quality: 90 }).toFile(path('public/favicon-192.png'));
-// iOS ignores transparency, so the touch icon is a full square crop.
-await crop(FACE).resize(180, 180).png({ palette: true, quality: 90 }).toFile(path('public/apple-touch-icon.png'));
+// Logo mark — keep in sync with src/components/LogoMark.astro.
+const mark = (tileRadius = 14) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="${tileRadius}" fill="#15171b"/>
+  <g fill="none" stroke="#fafaf8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 46 V27"/>
+    <path d="M21 35 C21 29.5 25.5 26.5 32 27"/>
+    <path d="M43 27 V45 C43 51 39.5 54 33 53.5"/>
+  </g>
+  <circle cx="43" cy="16.5" r="4.2" fill="#8ea9ff"/>
+</svg>
+`;
+
+await writeFile(path('public/favicon.svg'), mark());
+const png = (svg, size) => sharp(Buffer.from(svg), { density: 600 }).resize(size, size).png({ compressionLevel: 9 });
+await png(mark(), 32).toFile(path('public/favicon-32.png'));
+await png(mark(), 192).toFile(path('public/favicon-192.png'));
+// iOS rounds the corners itself and ignores transparency, so the touch icon is a full square.
+await png(mark(0), 180).toFile(path('public/apple-touch-icon.png'));
 
 // Social preview
 const name = 'Ritwick Johari';
@@ -96,4 +108,4 @@ await sharp(Buffer.from(og))
   .png({ compressionLevel: 9 })
   .toFile(path('public/og.png'));
 
-console.log(`Generated avatars, icons and og.png for ${name}.`);
+console.log(`Generated logo icons, hero portrait and og.png for ${name}.`);

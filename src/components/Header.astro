@@ -1,7 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import avatarFace from '../assets/avatar-face.jpg';
+import LogoMark from './LogoMark.astro';
 import { navigation, profile } from '../data/profile';
 import { withBase } from '../utils/url';
 
@@ -13,7 +12,7 @@ const href = (id: string) => (isHome ? `#${id}` : `${withBase('')}#${id}`);
 <header class="site-header" id="top" data-header>
   <div class="container header-inner">
     <a class="wordmark" href={isHome ? '#top' : withBase('')}>
-      <Image src={avatarFace} alt="" width={32} height={32} densities={[1, 2]} loading="eager" class="avatar" />
+      <LogoMark size={32} />
       <span class="wordmark-name">{profile.name}</span>
     </a>
 
@@ -112,12 +111,12 @@ const href = (id: string) => (isHome ? `#${id}` : `${withBase('')}#${id}`);
     font-size: var(--fs-sm);
   }
 
-  .wordmark :global(.avatar) {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 0 1px var(--rule);
+  .wordmark :global(.mark) {
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .wordmark:hover :global(.mark) {
+    transform: rotate(-6deg);
   }
 
   .desktop-nav {
