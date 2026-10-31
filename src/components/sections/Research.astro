@@ -3,6 +3,7 @@ import SectionHead from '../SectionHead.astro';
 import Icon from '../Icon.astro';
 import { publications } from '../../data/publications';
 import { talks } from '../../data/talks';
+import { withBase } from '../../utils/url';
 
 // Plain-text citation copied by the "Copy citation" button.
 const cite = (p: (typeof publications)[number]) =>
@@ -71,6 +72,16 @@ const cite = (p: (typeof publications)[number]) =>
             <p class="venue">{t.host}</p>
             <p class="summary">{t.summary}</p>
             {t.recognition && <p class="recognition">{t.recognition}</p>}
+            {t.certificate && (
+              <div class="entry-actions">
+                <a class="icon-link" href={withBase(t.certificate)} target="_blank" rel="noopener">
+                  <Icon name="file-text" size={15} />
+                  <span>View certificate (PDF)</span>
+                  <Icon name="arrow-up-right" size={13} class="i-ext" />
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </div>
+            )}
           </article>
         ))
       }

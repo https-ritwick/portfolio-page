@@ -1,10 +1,11 @@
 ---
 import SectionHead from '../SectionHead.astro';
 import Icon from '../Icon.astro';
+import ProjectLinks from '../ProjectLinks.astro';
 import AgentsDiagram from '../diagrams/AgentsDiagram.astro';
 import FusionDiagram from '../diagrams/FusionDiagram.astro';
 import FogDiagram from '../diagrams/FogDiagram.astro';
-import { projects, type DiagramKind } from '../../data/projects';
+import { categories, projects, type DiagramKind, type FullProject, type CompactProject } from '../../data/projects';
 import { socials } from '../../data/profile';
 
 const diagrams: Record<DiagramKind, typeof AgentsDiagram> = {
@@ -14,14 +15,33 @@ const diagrams: Record<DiagramKind, typeof AgentsDiagram> = {
 };
 
 const github = socials.find((s) => s.icon === 'github');
+
+const groups = categories
+  .map((c) => {
+    const items = projects.filter((p) => p.categoryId === c.id);
+    return {
+      ...c,
+      count: items.length,
+      full: items.filter((p): p is FullProject => p.detail === 'full'),
+      compact: items.filter((p): p is CompactProject => p.detail === 'compact'),
+    };
+  })
+  .filter((g) => g.count > 0);
+
+// Filter bar: "Selected" (default) → "All" → one per category.
+const filters = [
+  { id: 'selected', label: 'Selected', count: projects.filter((p) => p.selected).length },
+  { id: 'all', label: 'All projects', count: projects.length },
+  ...groups.map((g) => ({ id: g.id, label: g.label, count: g.count })),
+];
 ---
 
 <section class="section" id="projects" aria-labelledby="projects-title">
   <div class="container">
     <SectionHead
       id="projects-title"
-      title="Selected projects"
-      description="Agent orchestration, perception research and distributed systems: what each one solves and what I built."
+      title="Projects"
+      description="My strongest work is shown first. Filter by area to see everything, from AI research to campus systems and games."
     >
       {
         github && (
@@ -34,113 +54,259 @@ const github = socials.find((s) => s.icon === 'github');
       }
     </SectionHead>
 
-    <div class="projects">
-      {
-        projects.map((p, i) => {
-          const Diagram = diagrams[p.diagram];
-          const hasLinks = p.links.repo || p.links.demo || p.links.publication;
-          return (
-            <article class="project" aria-labelledby={`project-${p.id}`} data-reveal>
-              <div class="p-id">
-                <p class="meta">
-                  {String(i + 1).padStart(2, '0')} · {p.category}
-                </p>
-                <h3 class="serif" id={`project-${p.id}`}>
-                  {p.name}
-                </h3>
-                <p class="p-tagline">{p.tagline}</p>
-                {p.outcome && <p class="p-outcome">{p.outcome}</p>}
-                {hasLinks && (
-                  <ul class="p-links" role="list">
-                    {p.links.repo && (
-                      <li>
-                        <a class="icon-link" href={p.links.repo} target="_blank" rel="noopener noreferrer">
-                          <Icon name="github" size={15} />
-                          <span>Source</span>
-                          <Icon name="arrow-up-right" size={13} class="i-ext" />
-                          <span class="sr-only"> code for {p.name} (opens in a new tab)</span>
-                        </a>
-                      </li>
-                    )}
-                    {p.links.publication && (
-                      <li>
-                        <a class="icon-link" href={p.links.publication} target="_blank" rel="noopener noreferrer">
-                          <Icon name="file-text" size={15} />
-                          <span>Paper</span>
-                          <Icon name="arrow-up-right" size={13} class="i-ext" />
-                          <span class="sr-only"> on IEEE Xplore (opens in a new tab)</span>
-                        </a>
-                      </li>
-                    )}
-                    {p.links.demo && (
-                      <li>
-                        <a class="icon-link" href={p.links.demo} target="_blank" rel="noopener noreferrer">
-                          <span>Live demo</span>
-                          <Icon name="arrow-up-right" size={13} class="i-ext" />
-                        </a>
-                      </li>
-                    )}
-                  </ul>
+    <div class="filter" data-requires-js>
+      <div class="filter-bar" role="group" aria-label="Filter projects">
+        {
+          filters.map((f) => (
+            <button type="button" class="filter-btn" data-filter={f.id} aria-pressed={f.id === 'selected' ? 'true' : 'false'}>
+              {f.label}
+              <span class="filter-count">{f.count}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+    </div>
+
+    <div class="project-list" data-project-list data-view="selected">
+    {
+      groups.map((g) => (
+        <div class="category" id={`projects-${g.id}`} data-category={g.id}>
+          <h3 class="cat-title">
+            {g.label}
+            <span class="cat-count">{g.count}</span>
+          </h3>
+
+          {g.full.map((p) => {
+            const Diagram = p.diagram ? diagrams[p.diagram] : undefined;
+            return (
+              <article
+                class="project"
+                aria-labelledby={`project-${p.id}`}
+                data-reveal
+                data-project={p.categoryId}
+                data-selected={p.selected ? '' : undefined}
+              >
+                <div class="p-id">
+                  <p class="meta">{p.topic}</p>
+                  <h4 class="serif" id={`project-${p.id}`}>
+                    {p.name}
+                  </h4>
+                  <p class="p-tagline">{p.tagline}</p>
+                  {p.outcome && <p class="p-outcome">{p.outcome}</p>}
+                  <ProjectLinks links={p.links} projectName={p.name} />
+                </div>
+
+                <div class="p-detail">
+                  <div>
+                    <p class="label">Problem</p>
+                    <p class="p-text">{p.problem}</p>
+                  </div>
+                  <div>
+                    <p class="label">Approach</p>
+                    <p class="p-text">{p.approach}</p>
+                  </div>
+                </div>
+
+                <div class="p-detail">
+                  <div>
+                    <p class="label">What I built</p>
+                    <ul class="p-built">
+                      {p.built.map((b) => (
+                        <li>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {p.stack && (
+                    <p class="stack">
+                      <span class="stack-label">Stack</span>
+                      {p.stack.join(' · ')}
+                    </p>
+                  )}
+                </div>
+
+                {Diagram && (
+                  <details class="disclosure p-arch">
+                    <summary>
+                      <Icon name="chevron-right" size={16} />
+                      Architecture diagram
+                    </summary>
+                    <div class="p-arch-body">
+                      <Diagram />
+                    </div>
+                  </details>
                 )}
-              </div>
+              </article>
+            );
+          })}
 
-              <div class="p-detail">
-                <div class="p-block">
-                  <h4 class="label">Problem</h4>
-                  <p>{p.problem}</p>
-                </div>
-                <div class="p-block">
-                  <h4 class="label">Approach</h4>
-                  <p>{p.approach}</p>
-                </div>
-              </div>
-
-              <div class="p-detail">
-                <div class="p-block">
-                  <h4 class="label">What I built</h4>
-                  <ul class="p-built">
-                    {p.built.map((b) => (
-                      <li>{b}</li>
-                    ))}
-                  </ul>
-                </div>
-                <p class="stack">
-                  <span class="stack-label">Stack</span>
-                  {p.stack.join(' · ')}
-                </p>
-              </div>
-
-              <details class="disclosure p-arch">
-                <summary>
-                  <Icon name="chevron-right" size={16} />
-                  Architecture diagram
-                </summary>
-                <div class="p-arch-body">
-                  <Diagram />
-                </div>
-              </details>
-            </article>
-          );
-        })
-      }
+          {g.compact.length > 0 && (
+            <div class="cards">
+              {g.compact.map((p) => (
+                <article
+                  class="card"
+                  aria-labelledby={`project-${p.id}`}
+                  data-reveal
+                  data-project={p.categoryId}
+                  data-selected={p.selected ? '' : undefined}
+                >
+                  <p class="meta">
+                    {p.topic}
+                    {p.note && <span class="card-note"> · {p.note}</span>}
+                  </p>
+                  <h4 class="serif" id={`project-${p.id}`}>
+                    {p.name}
+                  </h4>
+                  <p class="p-tagline">{p.tagline}</p>
+                  <p class="p-text card-summary">{p.summary}</p>
+                  {p.stack && (
+                    <p class="stack card-stack">
+                      <span class="stack-label">Stack</span>
+                      {p.stack.join(' · ')}
+                    </p>
+                  )}
+                  <ProjectLinks links={p.links} projectName={p.name} />
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      ))
+    }
     </div>
   </div>
 </section>
 
 <style>
+  /* ---------- Filter bar ---------- */
+
+  .filter {
+    margin-bottom: var(--s-6);
+  }
+
+  /* A segmented control; scrolls sideways on narrow screens instead of wrapping. */
+  .filter-bar {
+    display: flex;
+    gap: var(--s-1);
+    width: max-content;
+    max-width: 100%;
+    padding: var(--s-1);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex-shrink: 0;
+    min-height: 38px;
+    padding: 0 var(--s-4);
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition:
+      color var(--dur-fast),
+      background-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .filter-btn:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+  }
+
+  .filter-btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  }
+
+  .filter-count {
+    min-width: 1.4rem;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    text-align: center;
+    color: var(--ink-3);
+  }
+
+  .filter-btn[aria-pressed='true'] .filter-count {
+    background: color-mix(in srgb, var(--bg) 18%, transparent);
+    color: var(--bg);
+  }
+
+  /* ---------- Views ----------
+     Without JS every project shows, grouped under category headings.
+     With JS (html.js) the default "Selected" view applies from first paint,
+     so nothing shifts when the script runs; the script handles the other views. */
+
+  :global(html.js) [data-view='selected'] [data-project]:not([data-selected]),
+  :global(html.js) [data-view='selected'] .cards {
+    display: none;
+  }
+
+  :global(html.js) .project-list:not([data-view='all']) .cat-title {
+    display: none;
+  }
+
+  :global(html.js) .project-list:not([data-view='all']) .category + .category {
+    margin-top: 0;
+  }
+
+  /* Headings (and their rule) are hidden in filtered views; the list carries the rule instead. */
+  :global(html.js) .project-list:not([data-view='all']) {
+    border-top: 1px solid var(--ink);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .cat-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .category + .category {
+    margin-top: var(--s-8);
+  }
+
+  .cat-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--ink);
+    font-size: var(--fs-md);
+    font-weight: 600;
+  }
+
+  /* ---------- Full project rows ---------- */
+
   .project {
     display: grid;
     grid-template-columns: minmax(15rem, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
     gap: var(--s-4) var(--s-7);
     padding-block: var(--s-6);
-    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
   }
 
-  .project:first-child {
-    border-top-color: var(--ink);
-  }
-
-  h3 {
+  h4 {
     margin-top: var(--s-2);
     font-size: var(--fs-lg);
     font-weight: 600;
@@ -163,20 +329,13 @@ const github = socials.find((s) => s.icon === 'github');
     line-height: 1.45;
   }
 
-  .p-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--s-5);
-    margin-top: var(--s-3);
-  }
-
   .p-detail {
     display: grid;
     align-content: start;
     gap: var(--s-4);
   }
 
-  .p-block p,
+  .p-text,
   .p-built {
     margin-top: var(--s-1);
     font-size: var(--fs-sm);
@@ -205,15 +364,52 @@ const github = socials.find((s) => s.icon === 'github');
     padding-top: var(--s-3);
   }
 
+  /* ---------- Compact cards ---------- */
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-6);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .card h4 {
+    font-size: var(--fs-md);
+  }
+
+  .card-note {
+    color: var(--ink-2);
+  }
+
+  .card-summary {
+    margin-top: var(--s-3);
+  }
+
+  .card-stack {
+    margin-top: var(--s-3);
+  }
+
+  /* Push links to the bottom so cards in a row align. */
+  .card :global(.links) {
+    margin-top: auto;
+    padding-top: var(--s-3);
+  }
+
   @media (max-width: 1080px) {
     .project {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
 
-    .p-id {
-      grid-column: 1 / -1;
-    }
-
+    .p-id,
     .p-arch {
       grid-column: 1 / -1;
     }
@@ -223,6 +419,15 @@ const github = socials.find((s) => s.icon === 'github');
     .project {
       grid-template-columns: 1fr;
       gap: var(--s-4);
+    }
+
+    .cards {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+
+    .category + .category {
+      margin-top: var(--s-7);
     }
   }
 </style>

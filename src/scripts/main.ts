@@ -206,6 +206,54 @@ function initCopyButtons() {
   });
 }
 
+/* ------------------------------------------------------- Project filter */
+
+function initProjectFilter() {
+  const list = document.querySelector<HTMLElement>('[data-project-list]');
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+  const status = document.querySelector<HTMLElement>('[data-filter-status]');
+  if (!list || !buttons.length) return;
+
+  const items = Array.from(list.querySelectorAll<HTMLElement>('[data-project]'));
+  const groups = Array.from(list.querySelectorAll<HTMLElement>('[data-category]'));
+
+  const apply = (view: string, fromUser = false) => {
+    list.dataset.view = view;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === view)));
+
+    let shown = 0;
+    for (const item of items) {
+      const visible =
+        view === 'all' ||
+        (view === 'selected' ? item.hasAttribute('data-selected') : item.dataset.project === view);
+      item.hidden = !visible;
+      if (visible) {
+        shown++;
+        // Items that were hidden never intersected the viewport; show them at once.
+        if (fromUser) item.classList.add('is-visible');
+      }
+    }
+    for (const group of groups) {
+      group.hidden = !group.querySelector('[data-project]:not([hidden])');
+      const cards = group.querySelector<HTMLElement>('.cards');
+      if (cards) cards.hidden = !cards.querySelector('[data-project]:not([hidden])');
+    }
+
+    const label = buttons.find((b) => b.dataset.filter === view)?.firstChild?.textContent?.trim();
+    if (status) status.textContent = `Showing ${shown} ${shown === 1 ? 'project' : 'projects'}: ${label}`;
+  };
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      apply(b.dataset.filter ?? 'selected', true);
+      // Keep the active option in view when the bar scrolls sideways on phones.
+      b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }),
+  );
+
+  apply(list.dataset.view ?? 'selected');
+}
+
 /* ------------------------------------------------------------------ Boot */
 
 initTheme();
@@ -214,6 +262,7 @@ initActiveSection();
 initMobileMenu();
 initReveals();
 initCopyButtons();
+initProjectFilter();
 
 document.querySelectorAll<HTMLElement>('[data-year]').forEach((el) => {
   el.textContent = String(new Date().getFullYear());

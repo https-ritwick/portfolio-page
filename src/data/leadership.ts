@@ -4,7 +4,7 @@ export interface LeadershipRole {
   title: string;
   organization: string;
   period: string;
-  description: string;
+  description?: string;
   metric?: { value: string; label: string };
 }
 
@@ -23,6 +23,11 @@ export const leadership: LeadershipRole[] = [
     description:
       'Ran the internal round of Smart India Hackathon end to end, from team coordination to event operations on the day.',
     metric: { value: '1110+', label: 'participants' },
+  },
+  {
+    title: 'Secretary',
+    organization: 'Ek Bharat Shreshtha Bharat – Viksit Bharat Club, GGSIPU',
+    period: '2023 – 2024',
   },
   {
     title: 'Joint Secretary',

@@ -8,6 +8,8 @@ export interface Talk {
   date?: string;
   summary: string;
   recognition?: string;
+  /** Path under /public to a certificate or letter, e.g. 'certificates/talk.pdf'. */
+  certificate?: string;
 }
 
 export const talks: Talk[] = [
@@ -18,5 +20,6 @@ export const talks: Talk[] = [
     summary:
       'A seminar for students and faculty on how generative AI works: the technology underneath it and where it is being applied in practice.',
     recognition: 'Letter of Appreciation from the college',
+    certificate: 'certificates/generative-ai-talk-keshav-mahavidyalaya.pdf',
   },
 ];

@@ -7,7 +7,7 @@ export interface SocialLink {
   label: string;
   href: string;
   handle: string;
-  icon: 'github' | 'linkedin';
+  icon: 'github' | 'linkedin' | 'instagram';
 }
 
 export interface Education {
@@ -51,6 +51,12 @@ export const socials: SocialLink[] = [
     href: 'https://www.linkedin.com/in/ritwick-johari',
     handle: 'linkedin.com/in/ritwick-johari',
     icon: 'linkedin',
+  },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/ritwickzzz/',
+    handle: '@ritwickzzz',
+    icon: 'instagram',
   },
 ];
 

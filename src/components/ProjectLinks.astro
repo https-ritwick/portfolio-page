@@ -1,0 +1,51 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+import { linkLabels, type LinkKind, type ProjectLink } from '../data/projects';
+
+interface Props {
+  links: ProjectLink[];
+  projectName: string;
+}
+
+const { links, projectName } = Astro.props;
+
+const icons: Record<LinkKind, IconName> = {
+  source: 'github',
+  live: 'globe',
+  play: 'play',
+  paper: 'file-text',
+};
+
+// Live and playable links first: they're the quickest way to evaluate a project.
+const order: LinkKind[] = ['play', 'live', 'paper', 'source'];
+const sorted = [...links].sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind));
+---
+
+{
+  sorted.length > 0 && (
+    <ul class="links" role="list">
+      {sorted.map((l) => (
+        <li>
+          <a class="icon-link" href={l.href} target="_blank" rel="noopener noreferrer">
+            <Icon name={icons[l.kind]} size={15} />
+            <span>{l.label ?? linkLabels[l.kind]}</span>
+            <Icon name="arrow-up-right" size={13} class="i-ext" />
+            <span class="sr-only">
+              {' '}
+              for {projectName} (opens in a new tab)
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    margin-top: var(--s-3);
+  }
+</style>

@@ -27,12 +27,12 @@ No analytics or trackers are included.
 ├── render.yaml              # Render Blueprint (static site, headers, env vars)
 ├── .node-version            # Node 24, read by Render and nvm/fnm
 ├── astro.config.mjs         # SITE_URL / BASE_PATH configuration
-├── public/                  # Copied as-is: resume.pdf, og.png, favicons
+├── public/                  # Copied as-is: resume.pdf, certificates/, og.png, favicons
 ├── scripts/generate-og.mjs  # Regenerates og.png + PNG favicons (npm run og)
 └── src/
     ├── data/                # ← ALL CONTENT LIVES HERE
     │   ├── profile.ts       #   name, current role, headline, intro, links, education, nav
-    │   ├── projects.ts      #   featured projects
+    │   ├── projects.ts      #   projects, categories and link types
     │   ├── experience.ts    #   roles (current role first)
     │   ├── publications.ts  #   papers
     │   ├── talks.ts         #   talks & speaking
@@ -182,9 +182,13 @@ All content is in `src/data/*.ts`. Components read from it, so you rarely touch 
 - **Current role changes:** update `current` in `profile.ts` (hero + "At a glance") and the first entry in `experience.ts`.
 - **Accenture details:** add `start`, `location`, `summary` and `highlights` to the Accenture entry in `experience.ts` once they're shareable.
 - **New job:** add an object at the top of `experience.ts`; mark it `current: true` and remove `current` from the previous one.
-- **New project:** add to `projects.ts`. Only add `repo`/`demo`/`publication` links that exist. For a new schematic,
-  add a component in `components/diagrams/` and register it in `Projects.astro`.
-- **New talk / paper / award:** `talks.ts`, `publications.ts`, `achievements.ts` (`tier: 'major'` is highlighted).
+- **New project:** add to `projects.ts` with a `categoryId` (`ai`, `campus` or `games`; add more in `categories`).
+  Use `detail: 'full'` for a full row (problem, approach, what I built) or `detail: 'compact'` for a short card.
+  Set `selected: true` to include it in the default "Selected" filter view.
+  Links are a list of `{ kind: 'source' | 'live' | 'play' | 'paper', href }`; only add URLs that exist.
+  For a schematic, set `diagram` (add new ones in `components/diagrams/` and register them in `Projects.astro`).
+- **New talk / paper / award:** `talks.ts` (put certificates in `public/certificates/` and set `certificate`), `publications.ts`, `achievements.ts` (`tier: 'major'` is highlighted).
+- **Leadership:** `leadership.ts` (`description` is optional).
 - **Skills:** `skills.ts`.
 - **Resume:** replace `public/resume.pdf` (keep the filename).
 - **About text:** written prose lives in `components/sections/About.astro`.

@@ -51,15 +51,17 @@ import { leadership } from '../../data/leadership';
                   <p class="f-title">
                     {r.title}, <span class="f-org">{r.organization}</span>
                   </p>
-                  <p class="f-sub">
-                    {r.description}
-                    {r.metric && (
-                      <strong class="f-metric">
-                        {' '}
-                        {r.metric.value} {r.metric.label}.
-                      </strong>
-                    )}
-                  </p>
+                  {r.description && (
+                    <p class="f-sub">
+                      {r.description}
+                      {r.metric && (
+                        <strong class="f-metric">
+                          {' '}
+                          {r.metric.value} {r.metric.label}.
+                        </strong>
+                      )}
+                    </p>
+                  )}
                   <p class="f-meta">
                     <span class="meta">{r.period}</span>
                   </p>
