@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from '../Icon.astro';
+import avatarBust from '../../assets/avatar-bust.jpg';
 import { profile, socials, education } from '../../data/profile';
 import { experience } from '../../data/experience';
 import { publications } from '../../data/publications';
@@ -36,12 +38,24 @@ const glance = [
 <section class="hero" aria-labelledby="hero-name">
   <div class="container hero-grid">
     <div class="hero-main">
-      <p class="status">
-        <span class="status-dot" aria-hidden="true"></span>
-        {profile.current.title} at <strong>{profile.current.organization}</strong>
-        <span class="status-sep" aria-hidden="true">·</span>
-        <span class="status-loc">{profile.location}</span>
-      </p>
+      <div class="identity">
+        <Image
+          src={avatarBust}
+          alt={`Portrait of ${profile.name}`}
+          width={80}
+          height={80}
+          densities={[1, 2]}
+          loading="eager"
+          fetchpriority="high"
+          class="portrait"
+        />
+        <p class="status">
+          <span class="status-dot" aria-hidden="true"></span>
+          {profile.current.title} at <strong>{profile.current.organization}</strong>
+          <span class="status-sep" aria-hidden="true">·</span>
+          <span class="status-loc">{profile.location}</span>
+        </p>
+      </div>
 
       <h1 class="name serif" id="hero-name">{profile.name}</h1>
       <p class="headline">{profile.headline}</p>
@@ -112,12 +126,28 @@ const glance = [
     align-items: center;
   }
 
-  .status {
+  .identity {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 0 var(--s-2);
+    gap: var(--s-4);
+  }
+
+  .identity :global(.portrait) {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface);
+    box-shadow:
+      0 0 0 4px var(--bg),
+      0 0 0 5px var(--rule);
+  }
+
+  /* Inline text flow so the dot stays attached to the first word when the line wraps. */
+  .status {
     font-size: var(--fs-sm);
+    line-height: 1.5;
     color: var(--ink-2);
   }
 
@@ -127,6 +157,9 @@ const glance = [
   }
 
   .status-dot {
+    display: inline-block;
+    margin-right: var(--s-2);
+    vertical-align: 1px;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -135,6 +168,7 @@ const glance = [
   }
 
   .status-sep {
+    margin-inline: var(--s-2);
     color: var(--ink-3);
   }
 

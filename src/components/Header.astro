@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
+import avatarFace from '../assets/avatar-face.jpg';
 import { navigation, profile } from '../data/profile';
 import { withBase } from '../utils/url';
 
@@ -11,7 +13,7 @@ const href = (id: string) => (isHome ? `#${id}` : `${withBase('')}#${id}`);
 <header class="site-header" id="top" data-header>
   <div class="container header-inner">
     <a class="wordmark" href={isHome ? '#top' : withBase('')}>
-      <span class="monogram" aria-hidden="true">{profile.initials}</span>
+      <Image src={avatarFace} alt="" width={32} height={32} densities={[1, 2]} loading="eager" class="avatar" />
       <span class="wordmark-name">{profile.name}</span>
     </a>
 
@@ -110,18 +112,12 @@ const href = (id: string) => (isHome ? `#${id}` : `${withBase('')}#${id}`);
     font-size: var(--fs-sm);
   }
 
-  .monogram {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: var(--radius);
-    background: var(--ink);
-    color: var(--bg);
-    font-family: var(--font-serif);
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+  .wordmark :global(.avatar) {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 1px var(--rule);
   }
 
   .desktop-nav {

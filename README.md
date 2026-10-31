@@ -28,8 +28,9 @@ No analytics or trackers are included.
 ├── .node-version            # Node 24, read by Render and nvm/fnm
 ├── astro.config.mjs         # SITE_URL / BASE_PATH configuration
 ├── public/                  # Copied as-is: resume.pdf, certificates/, og.png, favicons
-├── scripts/generate-og.mjs  # Regenerates og.png + PNG favicons (npm run og)
+├── scripts/generate-og.mjs  # Crops the portrait into avatars, favicons and og.png (npm run og)
 └── src/
+    ├── assets/              # portrait.webp (source photo) + generated avatar crops
     ├── data/                # ← ALL CONTENT LIVES HERE
     │   ├── profile.ts       #   name, current role, headline, intro, links, education, nav
     │   ├── projects.ts      #   projects, categories and link types
@@ -192,6 +193,7 @@ All content is in `src/data/*.ts`. Components read from it, so you rarely touch 
 - **Skills:** `skills.ts`.
 - **Resume:** replace `public/resume.pdf` (keep the filename).
 - **About text:** written prose lives in `components/sections/About.astro`.
+- **New photo:** replace `src/assets/portrait.webp`, adjust the `FACE` / `BUST` crop boxes in `scripts/generate-og.mjs` if needed, then run `npm run og`.
 - **Name, headline or current role change:** also run `npm run og` to regenerate the social preview image.
 - Run `npm run check && npm run build` before pushing.
 
