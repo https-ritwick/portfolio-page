@@ -1,0 +1,59 @@
+---
+import DiagramFrame from './DiagramFrame.astro';
+
+interface Props {
+  figure?: string;
+}
+
+const tiers = [
+  { head: 'EDGE', label: 'devices', sub: 'real-time vitals', x: 10 },
+  { head: 'FOG', label: 'fog nodes', sub: 'near-patient processing', x: 200 },
+  { head: 'CLOUD', label: 'Google Cloud', sub: 'storage · analytics', x: 390 },
+];
+---
+
+<DiagramFrame
+  figure={Astro.props.figure}
+  title="IoT-Fog · three-tier architecture"
+  caption="Simplified schematic. Health data flows from edge devices through fog nodes to Google Cloud. Processing near the patient keeps latency low, and Scikit-learn models drive the predictive analytics."
+>
+  <svg viewBox="0 0 560 250" role="img" aria-label="Three tiers: edge devices capture real-time vitals, fog nodes process data near the patient, and Google Cloud handles storage and analytics. Scikit-learn models predict diabetes and heart disease from real-time health data. Latency is lowest at the edge.">
+    <defs>
+      <marker id="fog-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L8 4 L0 8 z" class="d-arrow--accent" />
+      </marker>
+      <marker id="fog-arrow-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L8 4 L0 8 z" class="d-arrow" />
+      </marker>
+    </defs>
+
+    {
+      tiers.map((t, i) => (
+        <g>
+          <text class="d-head" x={t.x} y="16">{t.head}</text>
+          <line class="d-rule" x1={t.x} y1="24" x2={t.x + 160} y2="24" />
+          <rect class:list={['d-box', i === 1 ? 'd-box--accent' : 'd-box--strong']} x={t.x} y="44" width="160" height="56" />
+          <text class:list={['d-label', i === 1 && 'd-label--accent']} x={t.x + 80} y="68" text-anchor="middle">
+            {t.label}
+          </text>
+          <text class="d-sub" x={t.x + 80} y="85" text-anchor="middle">{t.sub}</text>
+          {i < tiers.length - 1 && (
+            <path class="d-edge d-edge--accent" d={`M${t.x + 160} 72 L${t.x + 188} 72`} marker-end="url(#fog-arrow)" />
+          )}
+        </g>
+      ))
+    }
+
+    <!-- predictive models, fed by the real-time data stream -->
+    <path class="d-edge d-edge--dashed" d="M364 72 L364 150" />
+    <rect class="d-box d-box--strong" x="200" y="134" width="350" height="50" />
+    <text class="d-label" x="216" y="156">Scikit-learn models</text>
+    <text class="d-sub" x="216" y="172">diabetes · heart-disease prediction on real-time data</text>
+    <circle cx="364" cy="72" r="3" class="d-arrow--accent" />
+
+    <!-- latency axis -->
+    <path class="d-edge" d="M550 222 L14 222" marker-end="url(#fog-arrow-muted)" />
+    <text class="d-sub" x="10" y="242">lower latency</text>
+    <text class="d-sub" x="550" y="242" text-anchor="end">further from the patient</text>
+  </svg>
+</DiagramFrame>

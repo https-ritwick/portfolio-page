@@ -1,0 +1,312 @@
+---
+import Icon from './Icon.astro';
+import { navigation, profile } from '../data/profile';
+import { withBase } from '../utils/url';
+
+// On the home page anchors are local (#projects); elsewhere (404) they point home.
+const isHome = Astro.url.pathname.replace(/\/$/, '') === withBase('').replace(/\/$/, '');
+const href = (id: string) => (isHome ? `#${id}` : `${withBase('')}#${id}`);
+---
+
+<header class="site-header" id="top" data-header>
+  <div class="container header-inner">
+    <a class="wordmark" href={isHome ? '#top' : withBase('')}>
+      <span class="monogram" aria-hidden="true">{profile.initials}</span>
+      <span class="wordmark-name">{profile.name}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary">
+      <ul role="list">
+        {
+          navigation.map((item) => (
+            <li>
+              <a href={href(item.id)} data-nav-link={item.id}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="contact-link" href={href('contact')} data-nav-link="contact">Contact</a>
+      <button class="icon-btn" type="button" data-theme-toggle data-requires-js aria-label="Switch to dark theme">
+        <Icon name="moon" size={18} class="icon-moon" />
+        <Icon name="sun" size={18} class="icon-sun" />
+      </button>
+      <a class="btn btn--primary btn--sm" href={withBase(profile.resumePath)} download={profile.resumeFileName}>
+        <Icon name="download" size={15} />
+        Resume
+      </a>
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+        data-requires-js
+      >
+        <span class="sr-only" data-menu-label>Open menu</span>
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+    <nav class="container" aria-label="Mobile">
+      <ul role="list">
+        {
+          navigation.map((item) => (
+            <li>
+              <a href={href(item.id)} data-nav-link={item.id} data-menu-link>
+                {item.label}
+                <Icon name="chevron-right" size={16} />
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={href('contact')} data-nav-link="contact" data-menu-link>
+            Contact
+            <Icon name="chevron-right" size={16} />
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .site-header[data-scrolled],
+  .site-header:has([data-mobile-menu]:not([hidden])) {
+    border-bottom-color: var(--rule);
+  }
+
+  .header-inner {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: var(--s-6);
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: var(--fs-sm);
+  }
+
+  .monogram {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .desktop-nav {
+    margin-left: auto;
+  }
+
+  .desktop-nav ul {
+    display: flex;
+    gap: var(--s-1);
+  }
+
+  .desktop-nav a,
+  .contact-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding-inline: var(--s-3);
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--ink-2);
+    transition:
+      color var(--dur-fast),
+      background-color var(--dur-fast);
+  }
+
+  .desktop-nav a:hover,
+  .contact-link:hover {
+    color: var(--ink);
+    background: var(--surface);
+  }
+
+  .desktop-nav a[aria-current='true'] {
+    color: var(--ink);
+  }
+
+  .desktop-nav a[aria-current='true']::after {
+    content: '';
+    position: absolute;
+    left: var(--s-3);
+    right: var(--s-3);
+    bottom: 2px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--accent);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .contact-link {
+    padding-inline: var(--s-3);
+  }
+
+  .header-actions :global(.icon-sun) {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .header-actions :global(.icon-sun) {
+    display: block;
+  }
+
+  :global(:root[data-theme='dark']) .header-actions :global(.icon-moon) {
+    display: none;
+  }
+
+  /* ---------- Mobile ---------- */
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .menu-icon {
+    position: relative;
+    width: 18px;
+    height: 10px;
+  }
+
+  .menu-icon span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition:
+      transform var(--dur) var(--ease),
+      top var(--dur) var(--ease);
+  }
+
+  .menu-icon span:first-child {
+    top: 0;
+  }
+
+  .menu-icon span:last-child {
+    top: calc(100% - 1.5px);
+  }
+
+  .menu-toggle[aria-expanded='true'] .menu-icon span {
+    top: calc(50% - 0.75px);
+  }
+
+  .menu-toggle[aria-expanded='true'] .menu-icon span:first-child {
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded='true'] .menu-icon span:last-child {
+    transform: rotate(-45deg);
+  }
+
+  /* Overlays the page (out of flow) so opening/closing never shifts content
+     or the anchor scroll position. */
+  .mobile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+    box-shadow: 0 16px 32px -24px rgb(0 0 0 / 0.35);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .mobile-menu[data-open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mobile-menu ul {
+    padding-block: var(--s-2) var(--s-4);
+  }
+
+  .mobile-menu a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--fs-md);
+    font-weight: 500;
+  }
+
+  .mobile-menu li:last-child a {
+    border-bottom: 0;
+  }
+
+  .mobile-menu a :global(svg) {
+    color: var(--ink-3);
+  }
+
+  .mobile-menu a[aria-current='true'] {
+    color: var(--accent);
+  }
+
+  @media (max-width: 1000px) {
+    .contact-link {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .desktop-nav {
+      display: none;
+    }
+
+    .header-actions {
+      margin-left: auto;
+    }
+
+    .menu-toggle {
+      display: inline-grid;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .wordmark-name {
+      display: none;
+    }
+  }
+</style>

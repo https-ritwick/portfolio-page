@@ -1,0 +1,289 @@
+---
+import Icon from '../Icon.astro';
+import { profile, socials, education } from '../../data/profile';
+import { experience } from '../../data/experience';
+import { publications } from '../../data/publications';
+import { achievements } from '../../data/achievements';
+import { talks } from '../../data/talks';
+import { withBase } from '../../utils/url';
+
+const previous = experience.find((r) => !r.current);
+const paper = publications[0];
+const topAward = achievements[0];
+const wins = achievements.filter((a) => a.placement === 'Winner').length;
+const talk = talks[0];
+const degree = education[0]!;
+
+// The verified facts a recruiter scans for, each linking to its evidence.
+const glance = [
+  { label: 'Now', value: `${profile.current.title}, ${profile.current.organization}`, href: '#experience' },
+  previous && {
+    label: 'Previously',
+    value: `${previous.title.replace(' Intern', '')}, ${previous.organization}`,
+    href: '#experience',
+  },
+  paper && { label: 'Research', value: `First-author paper, ${paper.venueShort} · IEEE Xplore`, href: '#research' },
+  topAward && {
+    label: 'Awards',
+    value: `${topAward.placement}, IBM watsonx Hackathon${wins ? ` · ${wins} hackathon wins` : ''}`,
+    href: '#awards',
+  },
+  talk && { label: 'Speaking', value: `“${talk.title}”, University of Delhi`, href: '#research' },
+  { label: 'Education', value: `B.Tech AI & Data Science, GGSIPU · ${degree.detail.replace(' / 10', '')}`, href: '#about' },
+].filter(Boolean) as { label: string; value: string; href: string }[];
+---
+
+<section class="hero" aria-labelledby="hero-name">
+  <div class="container hero-grid">
+    <div class="hero-main">
+      <p class="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        {profile.current.title} at <strong>{profile.current.organization}</strong>
+        <span class="status-sep" aria-hidden="true">·</span>
+        <span class="status-loc">{profile.location}</span>
+      </p>
+
+      <h1 class="name serif" id="hero-name">{profile.name}</h1>
+      <p class="headline">{profile.headline}</p>
+      <p class="intro">{profile.intro}</p>
+
+      <ul class="focus" role="list" aria-label="Focus areas">
+        {profile.focusAreas.map((f) => <li>{f}</li>)}
+      </ul>
+
+      <div class="actions">
+        <a class="btn btn--primary" href={withBase(profile.resumePath)} download={profile.resumeFileName}>
+          <Icon name="download" size={16} /> Download resume
+        </a>
+        <a class="btn" href="#projects">
+          View projects <Icon name="arrow-right" size={16} />
+        </a>
+      </div>
+
+      <ul class="profiles" role="list" aria-label="Profiles">
+        {
+          socials.map((s) => (
+            <li>
+              <a class="icon-link" href={s.href} target="_blank" rel="noopener noreferrer">
+                <Icon name={s.icon} size={16} />
+                <span>{s.label}</span>
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="icon-link" href={`mailto:${profile.email}`}>
+            <Icon name="mail" size={16} />
+            <span>{profile.email}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <aside class="glance" aria-labelledby="glance-title">
+      <h2 class="label" id="glance-title">At a glance</h2>
+      <ul role="list">
+        {
+          glance.map((g) => (
+            <li>
+              <a href={g.href}>
+                <span class="g-label">{g.label}</span>
+                <span class="g-value">{g.value}</span>
+                <Icon name="chevron-right" size={16} class="g-arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) clamp(3rem, 2rem + 3vw, 4.5rem);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(19rem, 1fr);
+    gap: var(--s-8);
+    align-items: center;
+  }
+
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .status strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--positive);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--positive) 18%, transparent);
+  }
+
+  .status-sep {
+    color: var(--ink-3);
+  }
+
+  .name {
+    margin-top: var(--s-4);
+    font-size: var(--fs-2xl);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  .headline {
+    margin-top: var(--s-3);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  .intro {
+    margin-top: var(--s-4);
+    max-width: 58ch;
+    color: var(--ink-2);
+  }
+
+  .focus {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) 0;
+    margin-top: var(--s-4);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* Separator trails each item so a wrapped line never starts with a dot. */
+  .focus li:not(:last-child)::after {
+    content: '·';
+    margin-inline: var(--s-2);
+    color: var(--ink-3);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+
+  .profiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-4);
+  }
+
+  /* ---------- At a glance ---------- */
+
+  .glance {
+    padding: var(--s-5) var(--s-5) var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .glance ul {
+    margin-top: var(--s-3);
+  }
+
+  .glance li + li {
+    border-top: 1px solid var(--rule);
+  }
+
+  .glance a {
+    display: grid;
+    grid-template-columns: 5.75rem 1fr auto;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding-block: 0.7rem;
+  }
+
+  .g-label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+
+  .g-value {
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink);
+    transition: color var(--dur-fast);
+  }
+
+  .glance :global(.g-arrow) {
+    align-self: center;
+    color: var(--ink-3);
+    transition:
+      transform var(--dur) var(--ease),
+      color var(--dur-fast);
+  }
+
+  .glance a:hover .g-value {
+    color: var(--accent);
+  }
+
+  .glance a:hover :global(.g-arrow) {
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 960px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-7);
+    }
+
+    .glance {
+      max-width: 40rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .status-sep,
+    .status-loc {
+      display: none;
+    }
+
+    .actions .btn {
+      flex: 1 1 10rem;
+    }
+
+    .glance {
+      padding-inline: var(--s-4);
+    }
+
+    .glance a {
+      grid-template-columns: 1fr auto;
+      gap: var(--s-1) var(--s-3);
+    }
+
+    .g-label {
+      grid-column: 1 / -1;
+    }
+
+    .glance :global(.g-arrow) {
+      grid-row: 2;
+      grid-column: 2;
+    }
+  }
+</style>

@@ -1,0 +1,171 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
+import { publications } from '../../data/publications';
+import { talks } from '../../data/talks';
+
+// Plain-text citation copied by the "Copy citation" button.
+const cite = (p: (typeof publications)[number]) =>
+  `${p.authors.map((a) => a.name).join(', ')} (${p.year}). ${p.title}. ${p.venue} (${p.venueShort}), ${p.host}.${p.url ? ' ' + p.url : ''}`;
+---
+
+<section class="section" id="research" aria-labelledby="research-title">
+  <div class="container">
+    <SectionHead id="research-title" title="Research & speaking" />
+
+    <div class="research-grid" data-reveal>
+      {
+        publications.map((p) => (
+          <article class="entry entry--paper" aria-labelledby="paper-title">
+            <p class="label">Peer-reviewed paper · {p.year}</p>
+            <h3 class="serif" id="paper-title">
+              {p.url ? (
+                <a href={p.url} target="_blank" rel="noopener noreferrer">
+                  {p.title}
+                  <span class="sr-only"> (opens IEEE Xplore in a new tab)</span>
+                </a>
+              ) : (
+                p.title
+              )}
+            </h3>
+            <p class="authors">
+              {p.authors.map((a, i) => (
+                <>
+                  {a.self ? <strong>{a.name}</strong> : a.name}
+                  {i < p.authors.length - 1 && ', '}
+                </>
+              ))}
+              <span class="first-author">· first author</span>
+            </p>
+            <p class="venue">
+              {p.venue} ({p.venueShort}), {p.host}
+            </p>
+            <p class="summary">{p.summary}</p>
+            <div class="entry-actions">
+              {p.url && (
+                <a class="icon-link" href={p.url} target="_blank" rel="noopener noreferrer">
+                  <Icon name="file-text" size={15} />
+                  <span>Read on IEEE Xplore</span>
+                  <Icon name="arrow-up-right" size={13} class="i-ext" />
+                </a>
+              )}
+              <button class="icon-link copy-btn" type="button" data-copy={cite(p)} data-copy-label="Citation copied" data-requires-js>
+                <Icon name="copy" size={15} />
+                <span data-copy-text>Copy citation</span>
+              </button>
+            </div>
+          </article>
+        ))
+      }
+
+      {
+        talks.map((t) => (
+          <article class="entry entry--talk" aria-labelledby="talk-title">
+            <p class="label">
+              {t.format}
+              {t.date && ` · ${t.date}`}
+            </p>
+            <h3 class="serif" id="talk-title">
+              {t.title}
+            </h3>
+            <p class="venue">{t.host}</p>
+            <p class="summary">{t.summary}</p>
+            {t.recognition && <p class="recognition">{t.recognition}</p>}
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .research-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--s-6);
+  }
+
+  .entry {
+    padding: var(--s-6);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+  }
+
+  .entry--talk {
+    background: var(--surface);
+  }
+
+  h3 {
+    margin-top: var(--s-3);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  h3 a {
+    transition: color var(--dur-fast);
+  }
+
+  h3 a:hover {
+    color: var(--accent);
+  }
+
+  .authors {
+    margin-top: var(--s-3);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .authors strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .first-author {
+    margin-left: var(--s-1);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .venue {
+    margin-top: var(--s-1);
+    font-size: var(--fs-sm);
+    font-style: italic;
+    color: var(--ink-3);
+  }
+
+  .summary {
+    margin-top: var(--s-4);
+    font-size: var(--fs-sm);
+    line-height: 1.65;
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+
+  .entry-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-4);
+  }
+
+  .recognition {
+    margin-top: var(--s-4);
+    padding-left: var(--s-3);
+    border-left: 2px solid var(--accent);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+  }
+
+  @media (max-width: 860px) {
+    .research-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+
+    .entry {
+      padding: var(--s-5);
+    }
+  }
+</style>

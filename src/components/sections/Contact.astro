@@ -1,0 +1,120 @@
+---
+import Icon from '../Icon.astro';
+import { profile, socials } from '../../data/profile';
+import { withBase } from '../../utils/url';
+---
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <div class="container contact-grid" data-reveal>
+    <div>
+      <h2 class="serif" id="contact-title">Get in touch</h2>
+      <p class="contact-lede">
+        I'm open to conversations about software engineering roles and AI/LLM projects. Email is the fastest way to
+        reach me.
+      </p>
+    </div>
+
+    <div class="contact-card">
+      <a class="email serif" href={`mailto:${profile.email}`}>{profile.email}</a>
+      <div class="contact-actions">
+        <a class="btn btn--primary" href={`mailto:${profile.email}`}>
+          <Icon name="mail" size={16} /> Send an email
+        </a>
+        <button class="btn" type="button" data-copy={profile.email} data-copy-label="Copied" data-requires-js>
+          <Icon name="copy" size={16} />
+          <span data-copy-text>Copy address</span>
+        </button>
+        <a class="btn" href={withBase(profile.resumePath)} download={profile.resumeFileName}>
+          <Icon name="download" size={16} /> Resume (PDF)
+        </a>
+      </div>
+      <ul class="contact-links" role="list">
+        {
+          socials.map((s) => (
+            <li>
+              <a class="icon-link" href={s.href} target="_blank" rel="noopener noreferrer">
+                <Icon name={s.icon} size={16} />
+                <span>{s.handle}</span>
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--s-7);
+    align-items: start;
+  }
+
+  h2 {
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .contact-lede {
+    margin-top: var(--s-3);
+    max-width: 40ch;
+    color: var(--ink-2);
+  }
+
+  .contact-card {
+    padding: var(--s-6);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .email {
+    display: inline-block;
+    font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    transition: color var(--dur-fast);
+  }
+
+  .email:hover {
+    color: var(--accent);
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-5);
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-6);
+    margin-top: var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 860px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-5);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .contact-card {
+      padding: var(--s-5);
+    }
+
+    .contact-actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

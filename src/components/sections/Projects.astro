@@ -1,0 +1,228 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
+import AgentsDiagram from '../diagrams/AgentsDiagram.astro';
+import FusionDiagram from '../diagrams/FusionDiagram.astro';
+import FogDiagram from '../diagrams/FogDiagram.astro';
+import { projects, type DiagramKind } from '../../data/projects';
+import { socials } from '../../data/profile';
+
+const diagrams: Record<DiagramKind, typeof AgentsDiagram> = {
+  agents: AgentsDiagram,
+  fusion: FusionDiagram,
+  fog: FogDiagram,
+};
+
+const github = socials.find((s) => s.icon === 'github');
+---
+
+<section class="section" id="projects" aria-labelledby="projects-title">
+  <div class="container">
+    <SectionHead
+      id="projects-title"
+      title="Selected projects"
+      description="Agent orchestration, perception research and distributed systems: what each one solves and what I built."
+    >
+      {
+        github && (
+          <a slot="action" class="icon-link" href={github.href} target="_blank" rel="noopener noreferrer">
+            <Icon name="github" size={16} />
+            <span>All repositories</span>
+            <Icon name="arrow-up-right" size={14} class="i-ext" />
+          </a>
+        )
+      }
+    </SectionHead>
+
+    <div class="projects">
+      {
+        projects.map((p, i) => {
+          const Diagram = diagrams[p.diagram];
+          const hasLinks = p.links.repo || p.links.demo || p.links.publication;
+          return (
+            <article class="project" aria-labelledby={`project-${p.id}`} data-reveal>
+              <div class="p-id">
+                <p class="meta">
+                  {String(i + 1).padStart(2, '0')} · {p.category}
+                </p>
+                <h3 class="serif" id={`project-${p.id}`}>
+                  {p.name}
+                </h3>
+                <p class="p-tagline">{p.tagline}</p>
+                {p.outcome && <p class="p-outcome">{p.outcome}</p>}
+                {hasLinks && (
+                  <ul class="p-links" role="list">
+                    {p.links.repo && (
+                      <li>
+                        <a class="icon-link" href={p.links.repo} target="_blank" rel="noopener noreferrer">
+                          <Icon name="github" size={15} />
+                          <span>Source</span>
+                          <Icon name="arrow-up-right" size={13} class="i-ext" />
+                          <span class="sr-only"> code for {p.name} (opens in a new tab)</span>
+                        </a>
+                      </li>
+                    )}
+                    {p.links.publication && (
+                      <li>
+                        <a class="icon-link" href={p.links.publication} target="_blank" rel="noopener noreferrer">
+                          <Icon name="file-text" size={15} />
+                          <span>Paper</span>
+                          <Icon name="arrow-up-right" size={13} class="i-ext" />
+                          <span class="sr-only"> on IEEE Xplore (opens in a new tab)</span>
+                        </a>
+                      </li>
+                    )}
+                    {p.links.demo && (
+                      <li>
+                        <a class="icon-link" href={p.links.demo} target="_blank" rel="noopener noreferrer">
+                          <span>Live demo</span>
+                          <Icon name="arrow-up-right" size={13} class="i-ext" />
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
+
+              <div class="p-detail">
+                <div class="p-block">
+                  <h4 class="label">Problem</h4>
+                  <p>{p.problem}</p>
+                </div>
+                <div class="p-block">
+                  <h4 class="label">Approach</h4>
+                  <p>{p.approach}</p>
+                </div>
+              </div>
+
+              <div class="p-detail">
+                <div class="p-block">
+                  <h4 class="label">What I built</h4>
+                  <ul class="p-built">
+                    {p.built.map((b) => (
+                      <li>{b}</li>
+                    ))}
+                  </ul>
+                </div>
+                <p class="stack">
+                  <span class="stack-label">Stack</span>
+                  {p.stack.join(' · ')}
+                </p>
+              </div>
+
+              <details class="disclosure p-arch">
+                <summary>
+                  <Icon name="chevron-right" size={16} />
+                  Architecture diagram
+                </summary>
+                <div class="p-arch-body">
+                  <Diagram />
+                </div>
+              </details>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .project {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+    gap: var(--s-4) var(--s-7);
+    padding-block: var(--s-6);
+    border-top: 1px solid var(--rule);
+  }
+
+  .project:first-child {
+    border-top-color: var(--ink);
+  }
+
+  h3 {
+    margin-top: var(--s-2);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .p-tagline {
+    margin-top: var(--s-1);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .p-outcome {
+    margin-top: var(--s-3);
+    padding-left: var(--s-3);
+    border-left: 2px solid var(--accent);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .p-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    margin-top: var(--s-3);
+  }
+
+  .p-detail {
+    display: grid;
+    align-content: start;
+    gap: var(--s-4);
+  }
+
+  .p-block p,
+  .p-built {
+    margin-top: var(--s-1);
+    font-size: var(--fs-sm);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .p-built {
+    padding-left: 1.1rem;
+  }
+
+  .p-built li + li {
+    margin-top: var(--s-1);
+  }
+
+  .p-built li::marker {
+    color: var(--ink-3);
+  }
+
+  .p-arch {
+    grid-column: 2 / -1;
+    margin-top: calc(var(--s-2) * -1);
+  }
+
+  .p-arch-body {
+    padding-top: var(--s-3);
+  }
+
+  @media (max-width: 1080px) {
+    .project {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .p-id {
+      grid-column: 1 / -1;
+    }
+
+    .p-arch {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .project {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+  }
+</style>

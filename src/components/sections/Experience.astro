@@ -1,0 +1,178 @@
+---
+import SectionHead from '../SectionHead.astro';
+import { experience } from '../../data/experience';
+---
+
+<section class="section" id="experience" aria-labelledby="experience-title">
+  <div class="container">
+    <SectionHead id="experience-title" title="Experience" />
+
+    <ol class="roles" role="list">
+      {
+        experience.map((role) => (
+          <li class="role" data-reveal>
+            <div class="r-when">
+              <p class="meta r-dates">
+                {role.start ? `${role.start} – ${role.end}` : role.end}
+              </p>
+              {role.current && <p class="r-current">Current role</p>}
+              {role.location && <p class="r-loc">{role.location}</p>}
+            </div>
+
+            <div class="r-body">
+              <h3>
+                <span class="r-title">{role.title}</span>
+                <span class="r-org serif">{role.organization}</span>
+              </h3>
+              {role.entity && <p class="r-entity">{role.entity}</p>}
+              {role.summary && <p class="r-summary">{role.summary}</p>}
+
+              {role.highlights && role.highlights.length > 0 && (
+                <ul class="r-highlights">
+                  {role.highlights.map((h) => (
+                    <li>
+                      <strong>{h.title}</strong> {h.detail}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {role.stack && role.stack.length > 0 && (
+                <p class="stack r-stack">
+                  <span class="stack-label">Stack</span>
+                  {role.stack.join(' · ')}
+                </p>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .role {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: var(--s-3) var(--s-7);
+    padding-block: var(--s-6);
+    border-top: 1px solid var(--rule);
+  }
+
+  .role:first-child {
+    border-top-color: var(--ink);
+  }
+
+  .r-dates {
+    font-size: var(--fs-sm);
+    color: var(--ink);
+  }
+
+  .r-current {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .r-current::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .r-loc {
+    margin-top: var(--s-1);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .r-body {
+    max-width: 48rem;
+  }
+
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-3);
+    font-size: var(--fs-md);
+  }
+
+  .r-title {
+    font-weight: 600;
+  }
+
+  .r-org {
+    font-size: var(--fs-md);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .r-org::before {
+    content: 'at ';
+    font-family: var(--font-sans);
+    font-size: var(--fs-sm);
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+
+  .r-entity {
+    margin-top: var(--s-1);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .r-summary {
+    margin-top: var(--s-3);
+    color: var(--ink-2);
+  }
+
+  .r-highlights {
+    margin-top: var(--s-4);
+    padding-left: 1.1rem;
+    display: grid;
+    gap: var(--s-2);
+    font-size: var(--fs-sm);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .r-highlights strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .r-highlights li::marker {
+    color: var(--ink-3);
+  }
+
+  .r-stack {
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 760px) {
+    .role {
+      grid-template-columns: 1fr;
+      gap: var(--s-3);
+    }
+
+    .r-when {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--s-1) var(--s-4);
+    }
+
+    .r-current,
+    .r-loc {
+      margin-top: 0;
+    }
+  }
+</style>

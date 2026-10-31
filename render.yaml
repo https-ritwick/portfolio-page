@@ -1,0 +1,42 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploys this portfolio as a free Render Static Site.
+# In the Render Dashboard choose  New → Blueprint, connect this repository,
+# and Render reads this file automatically.
+
+services:
+  - type: web
+    runtime: static
+    # The service name becomes your default URL: https://<name>.onrender.com
+    # If the name is already taken, Render appends a random suffix — update
+    # SITE_URL below to match the URL Render gives you.
+    name: ritwick-johari
+    branch: main
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    autoDeployTrigger: commit # redeploy on every push to `main`
+    envVars:
+      # Node version is pinned by .node-version (Render reads it automatically).
+      - key: SITE_URL
+        value: https://ritwick-johari.onrender.com
+    headers:
+      # Hashed build assets never change — cache them for a year.
+      - path: /_astro/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), interest-cohort=()
+    # Uncomment once you attach a custom domain (Dashboard → Settings → Custom Domains)
+    # domains:
+    #   - example.com
+    #   - www.example.com

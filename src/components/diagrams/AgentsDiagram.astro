@@ -1,0 +1,66 @@
+---
+import DiagramFrame from './DiagramFrame.astro';
+
+interface Props {
+  figure?: string;
+}
+
+const agents = ['consultation', 'diet', 'exercise', 'health education'];
+const agentY = (i: number) => 24 + i * 58;
+---
+
+<DiagramFrame
+  figure={Astro.props.figure}
+  title="BloomAI · agent topology"
+  caption="Simplified schematic. Four domain agents share a RAG pipeline grounded on IBM watsonx Granite models, inside a Firebase-backed application."
+>
+  <svg viewBox="0 0 520 300" role="img" aria-label="A user conversation is routed to four agents: consultation, diet, exercise and health education. Each agent uses a RAG pipeline backed by IBM watsonx Granite models. The application runs on Firebase.">
+    <defs>
+      <marker id="ag-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L8 4 L0 8 z" class="d-arrow--accent" />
+      </marker>
+    </defs>
+
+    <!-- user -->
+    <rect class="d-box d-box--strong" x="10" y="108" width="96" height="48" />
+    <text class="d-label" x="58" y="130" text-anchor="middle">user</text>
+    <text class="d-sub" x="58" y="145" text-anchor="middle">conversation</text>
+
+    <!-- agents -->
+    <text class="d-head" x="152" y="12">AGENTS</text>
+    {
+      agents.map((name, i) => (
+        <g>
+          <path
+            class="d-edge d-edge--accent"
+            d={`M106 132 C128 132 128 ${agentY(i) + 20} 150 ${agentY(i) + 20}`}
+            marker-end="url(#ag-arrow)"
+          />
+          <rect class="d-box d-box--strong" x="152" y={agentY(i)} width="150" height="40" />
+          <text class="d-label" x="166" y={agentY(i) + 24}>
+            {name}
+          </text>
+          <path
+            class="d-edge"
+            d={`M302 ${agentY(i) + 20} C324 ${agentY(i) + 20} 324 108 346 108`}
+          />
+        </g>
+      ))
+    }
+
+    <!-- RAG + model -->
+    <rect class="d-box d-box--accent" x="348" y="82" width="162" height="52" />
+    <text class="d-label d-label--accent" x="429" y="105" text-anchor="middle">RAG pipeline</text>
+    <text class="d-sub" x="429" y="121" text-anchor="middle">retrieval-augmented</text>
+
+    <path class="d-edge d-edge--accent" d="M429 134 L429 168" marker-end="url(#ag-arrow)" />
+
+    <rect class="d-box d-box--strong" x="348" y="170" width="162" height="52" />
+    <text class="d-label" x="429" y="193" text-anchor="middle">Granite models</text>
+    <text class="d-sub" x="429" y="209" text-anchor="middle">IBM watsonx</text>
+
+    <!-- application layer -->
+    <rect class="d-box d-box--ghost" x="10" y="260" width="500" height="30" />
+    <text class="d-sub" x="22" y="279">APPLICATION LAYER · FIREBASE</text>
+  </svg>
+</DiagramFrame>

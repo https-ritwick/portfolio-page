@@ -1,0 +1,154 @@
+---
+import SectionHead from '../SectionHead.astro';
+import { education } from '../../data/profile';
+import { leadership } from '../../data/leadership';
+---
+
+<section class="section" id="about" aria-labelledby="about-title">
+  <div class="container">
+    <SectionHead id="about-title" title="About" />
+
+    <div class="about-grid" data-reveal>
+      <div class="bio">
+        <p>
+          I'm a software engineer at <strong>Accenture</strong>. My focus is applied AI, where machine learning meets
+          careful software engineering: routing work between agents, grounding models in the right context, and moving
+          computation closer to the data it serves.
+        </p>
+        <p>
+          Before Accenture I was a Gen AI &amp; Software Trainee at <strong>EXL</strong>, contributing to an Agentic SDLC
+          platform and building a sprint-planning tool in Angular and Python. I studied AI &amp; Data Science at GGSIPU,
+          where I published FusionSight-YOLO and served as College President of the student council. Recently I gave a
+          talk on generative AI at Keshav Mahavidyalaya, University of Delhi.
+        </p>
+      </div>
+
+      <div class="facts">
+        <div class="fact-group">
+          <h3 class="label">Education</h3>
+          <ul role="list">
+            {
+              education.map((e) => (
+                <li>
+                  <p class="f-title">{e.credential}</p>
+                  <p class="f-sub">{e.school ? `${e.school}, ${e.institution}` : e.institution}</p>
+                  <p class="f-meta">
+                    <span class="meta">{e.period}</span>
+                    <span>{e.detail}</span>
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="fact-group">
+          <h3 class="label">Leadership</h3>
+          <ul role="list">
+            {
+              leadership.map((r) => (
+                <li>
+                  <p class="f-title">
+                    {r.title}, <span class="f-org">{r.organization}</span>
+                  </p>
+                  <p class="f-sub">
+                    {r.description}
+                    {r.metric && (
+                      <strong class="f-metric">
+                        {' '}
+                        {r.metric.value} {r.metric.label}.
+                      </strong>
+                    )}
+                  </p>
+                  <p class="f-meta">
+                    <span class="meta">{r.period}</span>
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-8);
+  }
+
+  .bio p {
+    font-size: var(--fs-md);
+    line-height: 1.7;
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
+
+  .bio p + p {
+    margin-top: var(--s-4);
+  }
+
+  .bio strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .fact-group ul {
+    margin-top: var(--s-2);
+  }
+
+  .fact-group li {
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .fact-group li:first-child {
+    border-top: 1px solid var(--rule);
+  }
+
+  .f-title {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .f-org {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .f-sub {
+    margin-top: 2px;
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .f-metric {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .f-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-4);
+    margin-top: var(--s-1);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+</style>

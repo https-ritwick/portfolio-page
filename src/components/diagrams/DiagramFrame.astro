@@ -1,0 +1,145 @@
+---
+/**
+ * Shared frame + drawing styles for the project schematics. Diagrams use the
+ * d-* classes below so every figure reads as one visual system in both themes.
+ */
+interface Props {
+  figure?: string;
+  title: string;
+  caption: string;
+}
+
+const { title, caption } = Astro.props;
+---
+
+<figure class="diagram" aria-label={title}>
+  <div class="diagram-body">
+    <slot />
+  </div>
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<style>
+  .diagram {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .diagram-body {
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+  }
+
+  .diagram-body :global(svg) {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    margin-inline: auto;
+    overflow: visible;
+  }
+
+  /* On phones, keep labels legible: the drawing keeps a minimum width and
+     scrolls sideways inside its frame instead of shrinking. */
+  @media (max-width: 560px) {
+    .diagram-body {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+    }
+
+    .diagram-body :global(svg) {
+      min-width: 500px;
+    }
+  }
+
+  figcaption {
+    padding: var(--s-3) var(--s-4);
+    border-top: 1px solid var(--rule);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  /* ---------- Drawing primitives ---------- */
+
+  .diagram :global(.d-box) {
+    fill: var(--bg);
+    stroke: var(--rule-strong);
+    stroke-width: 1;
+  }
+
+  .diagram :global(.d-box--strong) {
+    stroke: var(--ink-3);
+  }
+
+  .diagram :global(.d-box--accent) {
+    fill: var(--accent-wash);
+    stroke: var(--accent);
+    stroke-width: 1.25;
+  }
+
+  .diagram :global(.d-box--ghost) {
+    fill: none;
+    stroke: var(--rule-strong);
+    stroke-dasharray: 3 3;
+  }
+
+  .diagram :global(.d-target) {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.25;
+  }
+
+  .diagram :global(.d-label) {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    fill: var(--ink);
+  }
+
+  .diagram :global(.d-label--accent) {
+    fill: var(--accent);
+  }
+
+  .diagram :global(.d-sub) {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    fill: var(--ink-3);
+  }
+
+  .diagram :global(.d-head) {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    fill: var(--ink-3);
+  }
+
+  .diagram :global(.d-edge) {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1;
+  }
+
+  .diagram :global(.d-edge--accent) {
+    stroke: var(--accent);
+    stroke-width: 1.25;
+  }
+
+  .diagram :global(.d-edge--dashed) {
+    stroke-dasharray: 3 3;
+  }
+
+  .diagram :global(.d-arrow) {
+    fill: var(--ink-3);
+  }
+
+  .diagram :global(.d-arrow--accent) {
+    fill: var(--accent);
+  }
+
+  .diagram :global(.d-rule) {
+    stroke: var(--rule-strong);
+    stroke-width: 1;
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+/**
+ * Compact section header: a plainly named heading plus an optional one-line
+ * description. An optional `action` slot sits on the right (e.g. "All repositories").
+ */
+interface Props {
+  /** id of the h2, referenced by the section's aria-labelledby. */
+  id: string;
+  title: string;
+  description?: string;
+}
+
+const { id, title, description } = Astro.props;
+---
+
+<header class="section-head">
+  <div>
+    <h2 class="serif" id={id}>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+  {Astro.slots.has('action') && <div class="section-action"><slot name="action" /></div>}
+</header>
+
+<style>
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-6);
+    margin-bottom: var(--s-6);
+  }
+
+  h2 {
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  p {
+    margin-top: var(--s-2);
+    max-width: 60ch;
+    color: var(--ink-2);
+  }
+</style>

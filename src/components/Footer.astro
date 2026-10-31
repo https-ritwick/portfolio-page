@@ -1,0 +1,72 @@
+---
+import Icon from './Icon.astro';
+import { profile, socials } from '../data/profile';
+import { withBase } from '../utils/url';
+
+const year = new Date().getFullYear();
+const isHome = Astro.url.pathname.replace(/\/$/, '') === withBase('').replace(/\/$/, '');
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>© <span data-year>{year}</span> {profile.name}</p>
+    <ul role="list" class="footer-links">
+      {
+        socials.map((s) => (
+          <li>
+            <a href={s.href} target="_blank" rel="noopener noreferrer">
+              {s.label}
+              <span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+        ))
+      }
+      <li><a href={`mailto:${profile.email}`}>Email</a></li>
+      <li><a href={withBase(profile.resumePath)} download={profile.resumeFileName}>Resume</a></li>
+    </ul>
+    <a class="to-top" href={isHome ? '#top' : withBase('')}>
+      Back to top <Icon name="arrow-up" size={14} />
+    </a>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--rule);
+    padding-block: var(--s-6);
+    font-size: var(--fs-sm);
+    color: var(--ink-3);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-6);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+  }
+
+  .footer-links a,
+  .to-top {
+    color: var(--ink-2);
+    transition: color var(--dur-fast);
+  }
+
+  .footer-links a:hover,
+  .to-top:hover {
+    color: var(--accent);
+  }
+
+  .to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    min-height: 32px;
+  }
+</style>
