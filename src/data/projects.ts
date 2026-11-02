@@ -8,11 +8,17 @@
  * `diagram` (optional) adds an expandable architecture schematic.
  * `screenshot` (optional) shows a real screenshot of the project. Put the file in
  * src/assets/projects/ and import it below; Astro resizes and compresses it at build.
+ * `video` (optional, full projects) replaces the screenshot with a short muted demo:
+ * the MP4 goes in public/videos/, its poster frame in src/assets/projects/.
  */
 
 import type { ImageMetadata } from 'astro';
-import riffleShot from '../assets/projects/riffle.webp';
+import rifflePoster from '../assets/projects/riffle-demo-poster.jpg';
 import efestShot from '../assets/projects/efest.webp';
+import bloomShot from '../assets/projects/bloom.webp';
+import wasteguardShot from '../assets/projects/wasteguard.webp';
+import batchShot from '../assets/projects/batch.webp';
+import hostelShot from '../assets/projects/hostel.webp';
 
 export type DiagramKind = 'agents' | 'fusion' | 'fog';
 export type CategoryId = 'ai' | 'campus' | 'games';
@@ -21,7 +27,7 @@ export type LinkKind = 'source' | 'live' | 'play' | 'paper';
 export interface ProjectLink {
   kind: LinkKind;
   href: string;
-  /** Overrides the default label for this kind, e.g. "Team repository". */
+  /** Overrides the default label for this kind, e.g. "Repository". */
   label?: string;
 }
 
@@ -41,6 +47,8 @@ interface BaseProject {
   selected?: boolean;
   /** A real screenshot of the project; `alt` describes what it shows. */
   screenshot?: { src: ImageMetadata; alt: string };
+  /** Short muted demo clip. `src` is a path under public/; `label` describes it. */
+  video?: { src: string; poster: ImageMetadata; label: string; caption: string };
 }
 
 export interface FullProject extends BaseProject {
@@ -79,18 +87,24 @@ export const projects: Project[] = [
     detail: 'full',
     categoryId: 'ai',
     name: 'BloomAI',
-    tagline: 'Multi-agent conversational healthcare assistant',
+    tagline: 'Multi-agent AI assistant for menopause and women’s health',
     topic: 'Agentic AI',
     problem:
-      'A single general-purpose chatbot treats consultation, nutrition, exercise and health education the same way, though each needs different context.',
+      'Over 150 million women in India go through menopause, mostly without reliable information or empathetic care. A single general-purpose chatbot also treats medical, nutrition and fitness questions the same way, though each needs different context.',
     approach:
-      'Specialised autonomous agents, each owning one domain, grounded through RAG pipelines on IBM watsonx Granite models.',
+      'An orchestrator classifies each message and routes it to a specialised agent. The agents are grounded through RAG, reachable on the web and on WhatsApp, and work from the user’s logged symptoms and history.',
     built: [
-      'Four domain agents: consultation, diet, exercise and health education',
-      'RAG pipelines on watsonx Granite for context-aware recommendations',
-      'Application layer on Firebase',
+      'Orchestrator plus four agents: consultation, diet, exercise and menopause education',
+      'RAG pipelines for context-aware, evidence-based recommendations',
+      'Web app and WhatsApp channel (Twilio), with Google Calendar reminders and scheduling',
+      'Symptom and cycle calendar, trend charts and a downloadable health report',
+      'Consultation agent that points users to gynaecologists when symptoms are severe',
     ],
-    stack: ['IBM watsonx (Granite)', 'RAG', 'Multi-agent systems', 'Firebase'],
+    stack: ['IBM watsonx (Granite)', 'Llama 3.3', 'LangChain', 'Flask', 'RAG', 'Twilio', 'Google Calendar API', 'Firebase'],
+    screenshot: {
+      src: bloomShot,
+      alt: 'Three BloomAI phone screens: a daily overview with a 7-day wellness chart, a health report with symptom statistics, and a chat with the Bloom assistant.',
+    },
     // The repository on the resume (github.com/https-ritwick/Bloom-AI) is not public.
     // Add { kind: 'source', href: '…' } here once it is.
     links: [],
@@ -148,15 +162,15 @@ export const projects: Project[] = [
     tagline: 'Marine waste detection on sonar imagery',
     topic: 'Computer vision',
     summary:
-      'A YOLO object-detection model that finds waste in sonar imagery, served through a Flask web app that returns annotated detections for uploaded images.',
-    stack: ['YOLO (Ultralytics)', 'Python', 'Flask'],
-    note: 'Team project',
+      'Designed for forward-looking sonar cameras on ships: a YOLO model detects and classifies underwater debris across 11 classes, from bottles, cans and tyres to chains and propellers. A Flask web app returns annotated detections for uploaded images. Trained on public datasets so it can work across different water bodies.',
+    outcome: 'F1 0.90 across all 11 classes (precision 0.92, recall 0.90)',
+    stack: ['YOLO (Ultralytics)', 'Python', 'Flask', 'Computer vision'],
+    screenshot: {
+      src: wasteguardShot,
+      alt: 'F1–confidence curve for the 11 debris classes. The combined curve peaks at an F1 of 0.90 at a confidence of 0.457.',
+    },
     links: [
-      {
-        kind: 'source',
-        href: 'https://github.com/https-ritwick/marine-waste-detection-project',
-        label: 'Team repository',
-      },
+      { kind: 'source', href: 'https://github.com/https-ritwick/marine-waste-detection-project' },
     ],
   },
   {
@@ -164,9 +178,11 @@ export const projects: Project[] = [
     detail: 'compact',
     categoryId: 'ai',
     name: 'KrishiTech',
-    tagline: 'AI-based smart agriculture platform',
+    tagline: 'One-stop AI platform for farmers',
     topic: 'Applied AI',
-    summary: 'Brings crop prediction, crop-disease detection and farmer support together in one platform.',
+    summary:
+      'Location-aware crop recommendation (SVM on weather, soil and crop history), fertiliser recommendation (Random Forest on temperature, humidity, moisture, soil and NPK levels) and crop-disease detection from leaf images (CNN). Also covers a farmer marketplace without middlemen, NPK, moisture and temperature sensor input, and an English and Hindi chatbot.',
+    stack: ['Python', 'Scikit-learn', 'CNN', 'IoT sensors'],
     // github.com/https-ritwick/Krishi-Tech is not public yet. Once it is, uncomment:
     // links: [{ kind: 'source', href: 'https://github.com/https-ritwick/Krishi-Tech' }],
     links: [],
@@ -192,6 +208,10 @@ export const projects: Project[] = [
       'Document upload and verification, filters, search and Excel export for the Student Cell',
     ],
     stack: ['Go', 'MySQL', 'JWT', 'HTML', 'Tailwind CSS'],
+    screenshot: {
+      src: batchShot,
+      alt: 'The Batch & Group Allotment Portal home page with notices and a batch lookup box, overlapped by the Branch Upgrade form.',
+    },
     links: [{ kind: 'source', href: 'https://github.com/https-ritwick/Reporting-Management-System' }],
   },
   {
@@ -221,6 +241,10 @@ export const projects: Project[] = [
     summary:
       'Students apply for leave with a date range and reason and track each request; wardens approve or reject them from their own dashboard. Role-based logins keep each user to their own view.',
     stack: ['Go', 'MySQL', 'JWT', 'Bootstrap'],
+    screenshot: {
+      src: hostelShot,
+      alt: 'The student dashboard with a leave application form and previous requests, overlapped by the warden dashboard listing pending and past leave requests.',
+    },
     note: 'Built with Khushi Thakur',
     links: [{ kind: 'source', href: 'https://github.com/https-ritwick/Hostel-Leave-System_Demo' }],
   },
@@ -245,9 +269,11 @@ export const projects: Project[] = [
       'Voice chat over WebRTC with a WebSocket fallback, and Google sign-in groups with shared leaderboards',
     ],
     stack: ['TypeScript', 'React', 'Cloudflare Workers', 'Durable Objects', 'D1', 'WebRTC', 'Gemini API', 'Playwright'],
-    screenshot: {
-      src: riffleShot,
-      alt: 'Riffle home page: “Name the song before your friends do”, with Create a game, Play solo and Join with a code options.',
+    video: {
+      src: 'videos/riffle-demo.mp4',
+      poster: rifflePoster,
+      label: 'Riffle demo: starting a solo game, choosing a game mode, then answering a round correctly for 859 points.',
+      caption: 'Solo game demo · 24 s, no sound',
     },
     links: [
       { kind: 'play', href: 'https://riffle.musicquiz.workers.dev' },

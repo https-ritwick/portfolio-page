@@ -5,62 +5,76 @@ interface Props {
   figure?: string;
 }
 
-const agents = ['consultation', 'diet', 'exercise', 'health education'];
-const agentY = (i: number) => 24 + i * 58;
+const agents = ['consultation', 'diet', 'exercise', 'education'];
+const agentY = (i: number) => 24 + i * 56;
 ---
 
 <DiagramFrame
   figure={Astro.props.figure}
-  title="BloomAI · agent topology"
-  caption="Simplified schematic. Four domain agents share a RAG pipeline grounded on IBM watsonx Granite models, inside a Firebase-backed application."
+  title="BloomAI · solution architecture"
+  caption="Simplified schematic. Messages from the web app or WhatsApp reach an orchestrator that routes each query to one of four agents. The agents answer through a RAG pipeline; symptom logs, conversation history and user data are stored for context."
 >
-  <svg viewBox="0 0 520 300" role="img" aria-label="A user conversation is routed to four agents: consultation, diet, exercise and health education. Each agent uses a RAG pipeline backed by IBM watsonx Granite models. The application runs on Firebase.">
+  <svg viewBox="0 0 520 300" role="img" aria-label="The web app (REST API) and WhatsApp (Twilio) send messages to an orchestrator, which also connects to Google Calendar. The orchestrator routes each query to one of four agents: consultation, diet, exercise and education. The agents use a RAG pipeline backed by an LLM. A data store holds symptom logs, conversation history and user data.">
     <defs>
       <marker id="ag-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 L8 4 L0 8 z" class="d-arrow--accent" />
       </marker>
     </defs>
 
-    <!-- user -->
-    <rect class="d-box d-box--strong" x="10" y="108" width="96" height="48" />
-    <text class="d-label" x="58" y="130" text-anchor="middle">user</text>
-    <text class="d-sub" x="58" y="145" text-anchor="middle">conversation</text>
+    <!-- channels -->
+    <text class="d-head" x="10" y="12">CHANNELS</text>
+    <rect class="d-box d-box--strong" x="10" y="56" width="98" height="44" />
+    <text class="d-label" x="59" y="76" text-anchor="middle">web app</text>
+    <text class="d-sub" x="59" y="91" text-anchor="middle">REST API</text>
+    <rect class="d-box d-box--strong" x="10" y="140" width="98" height="44" />
+    <text class="d-label" x="59" y="160" text-anchor="middle">WhatsApp</text>
+    <text class="d-sub" x="59" y="175" text-anchor="middle">Twilio API</text>
+
+    <path class="d-edge d-edge--accent" d="M108 78 C120 78 120 116 130 116" marker-end="url(#ag-arrow)" />
+    <path class="d-edge d-edge--accent" d="M108 162 C120 162 120 132 130 132" marker-end="url(#ag-arrow)" />
+
+    <!-- orchestrator + calendar -->
+    <rect class="d-box d-box--accent" x="132" y="96" width="104" height="56" />
+    <text class="d-label d-label--accent" x="184" y="120" text-anchor="middle">orchestrator</text>
+    <text class="d-sub" x="184" y="136" text-anchor="middle">query routing</text>
+
+    <path class="d-edge d-edge--dashed" d="M184 152 L184 196" />
+    <rect class="d-box d-box--strong" x="132" y="196" width="104" height="44" />
+    <text class="d-label" x="184" y="216" text-anchor="middle">calendar</text>
+    <text class="d-sub" x="184" y="231" text-anchor="middle">Google Calendar</text>
 
     <!-- agents -->
-    <text class="d-head" x="152" y="12">AGENTS</text>
+    <text class="d-head" x="264" y="12">AGENTS</text>
     {
       agents.map((name, i) => (
         <g>
           <path
             class="d-edge d-edge--accent"
-            d={`M106 132 C128 132 128 ${agentY(i) + 20} 150 ${agentY(i) + 20}`}
+            d={`M236 124 C250 124 250 ${agentY(i) + 20} 262 ${agentY(i) + 20}`}
             marker-end="url(#ag-arrow)"
           />
-          <rect class="d-box d-box--strong" x="152" y={agentY(i)} width="150" height="40" />
-          <text class="d-label" x="166" y={agentY(i) + 24}>
+          <rect class="d-box d-box--strong" x="264" y={agentY(i)} width="116" height="40" />
+          <text class="d-label" x="276" y={agentY(i) + 24}>
             {name}
           </text>
-          <path
-            class="d-edge"
-            d={`M302 ${agentY(i) + 20} C324 ${agentY(i) + 20} 324 108 346 108`}
-          />
+          <path class="d-edge" d={`M380 ${agentY(i) + 20} C394 ${agentY(i) + 20} 394 98 406 98`} />
         </g>
       ))
     }
 
     <!-- RAG + model -->
-    <rect class="d-box d-box--accent" x="348" y="82" width="162" height="52" />
-    <text class="d-label d-label--accent" x="429" y="105" text-anchor="middle">RAG pipeline</text>
-    <text class="d-sub" x="429" y="121" text-anchor="middle">retrieval-augmented</text>
+    <rect class="d-box d-box--accent" x="406" y="72" width="104" height="52" />
+    <text class="d-label d-label--accent" x="458" y="95" text-anchor="middle">RAG pipeline</text>
+    <text class="d-sub" x="458" y="111" text-anchor="middle">grounded answers</text>
 
-    <path class="d-edge d-edge--accent" d="M429 134 L429 168" marker-end="url(#ag-arrow)" />
+    <path class="d-edge d-edge--accent" d="M458 124 L458 158" marker-end="url(#ag-arrow)" />
 
-    <rect class="d-box d-box--strong" x="348" y="170" width="162" height="52" />
-    <text class="d-label" x="429" y="193" text-anchor="middle">Granite models</text>
-    <text class="d-sub" x="429" y="209" text-anchor="middle">IBM watsonx</text>
+    <rect class="d-box d-box--strong" x="406" y="160" width="104" height="52" />
+    <text class="d-label" x="458" y="183" text-anchor="middle">LLM</text>
+    <text class="d-sub" x="458" y="199" text-anchor="middle">Granite · Llama 3.3</text>
 
-    <!-- application layer -->
+    <!-- data store -->
     <rect class="d-box d-box--ghost" x="10" y="260" width="500" height="30" />
-    <text class="d-sub" x="22" y="279">APPLICATION LAYER · FIREBASE</text>
+    <text class="d-sub" x="22" y="279">DATA · SYMPTOM LOGS · CONVERSATION HISTORY · USER DATA</text>
   </svg>
 </DiagramFrame>

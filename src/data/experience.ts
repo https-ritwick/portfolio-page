@@ -24,8 +24,9 @@ export const experience: Role[] = [
     organization: 'Accenture',
     entity: 'Accenture Solutions Private Limited',
     title: 'Advanced App Engineering Associate',
-    // Add your start date, office location, a one-line summary and highlights
-    // here as they become shareable, e.g. start: 'Aug 2026', location: 'Gurugram, India'.
+    // Add your office location, a one-line summary and highlights here as they
+    // become shareable, e.g. location: 'Gurugram, India'.
+    start: 'Aug 2026',
     end: 'Present',
     current: true,
   },

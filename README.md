@@ -189,6 +189,7 @@ All content is in `src/data/*.ts`. Components read from it, so you rarely touch 
   Links are a list of `{ kind: 'source' | 'live' | 'play' | 'paper', href }`; only add URLs that exist.
   For a schematic, set `diagram` (add new ones in `components/diagrams/` and register them in `Projects.astro`).
   For a screenshot, save it in `src/assets/projects/` (a 16:10 crop of the top of the page works best, about 1600px wide), import it at the top of `projects.ts` and set `screenshot: { src, alt }`. Astro resizes and compresses it at build.
+  For a demo video (full projects only), put a short muted H.264 MP4 in `public/videos/` (keep it under ~2 MB) and its first frame in `src/assets/projects/`, then set `video: { src, poster, label, caption }`. It autoplays muted while on screen, never with reduced motion, and stops auto-playing once someone uses its controls.
 - **New talk / paper / award:** `talks.ts` (put certificates in `public/certificates/` and set `certificate`), `publications.ts`, `achievements.ts` (`tier: 'major'` is highlighted).
 - **Leadership:** `leadership.ts` (`description` is optional).
 - **Skills:** `skills.ts`.

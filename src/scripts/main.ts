@@ -254,6 +254,44 @@ function initProjectFilter() {
   apply(list.dataset.view ?? 'selected');
 }
 
+/* ------------------------------------------------------------ Demo videos */
+
+// Muted demos play while on screen and pause when scrolled away. Nothing
+// autoplays with reduced motion, and once someone uses the controls they're in charge.
+function initDemoVideos() {
+  const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]'));
+  if (!videos.length || !('IntersectionObserver' in window) || prefersReducedMotion()) return;
+
+  // The play/pause event we caused ourselves, so it isn't mistaken for the user's.
+  const expected = new WeakMap<HTMLVideoElement, 'play' | 'pause'>();
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const video = entry.target as HTMLVideoElement;
+        if (entry.isIntersecting && video.paused) {
+          expected.set(video, 'play');
+          video.play().catch(() => expected.delete(video));
+        } else if (!entry.isIntersecting && !video.paused) {
+          expected.set(video, 'pause');
+          video.pause();
+        }
+      }
+    },
+    { threshold: 0.6 },
+  );
+
+  for (const video of videos) {
+    for (const type of ['play', 'pause'] as const) {
+      video.addEventListener(type, () => {
+        if (expected.get(video) === type) expected.delete(video);
+        else observer.unobserve(video);
+      });
+    }
+    observer.observe(video);
+  }
+}
+
 /* ------------------------------------------------------------------ Boot */
 
 initTheme();
@@ -263,6 +301,7 @@ initMobileMenu();
 initReveals();
 initCopyButtons();
 initProjectFilter();
+initDemoVideos();
 
 document.querySelectorAll<HTMLElement>('[data-year]').forEach((el) => {
   el.textContent = String(new Date().getFullYear());

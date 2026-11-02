@@ -19,3 +19,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# CV source (contains phone number; compile on Overleaf, publish only the PDF)
+cv/

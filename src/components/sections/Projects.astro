@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import SectionHead from '../SectionHead.astro';
 import Icon from '../Icon.astro';
 import ProjectLinks from '../ProjectLinks.astro';
@@ -8,6 +8,7 @@ import FusionDiagram from '../diagrams/FusionDiagram.astro';
 import FogDiagram from '../diagrams/FogDiagram.astro';
 import { categories, projects, type DiagramKind, type FullProject, type CompactProject } from '../../data/projects';
 import { socials } from '../../data/profile';
+import { withBase } from '../../utils/url';
 
 const diagrams: Record<DiagramKind, typeof AgentsDiagram> = {
   agents: AgentsDiagram,
@@ -16,6 +17,15 @@ const diagrams: Record<DiagramKind, typeof AgentsDiagram> = {
 };
 
 const github = socials.find((s) => s.icon === 'github');
+
+// Poster frames for demo videos, compressed like the other images.
+const posters = new Map(
+  await Promise.all(
+    projects.flatMap((p) =>
+      p.video ? [getImage({ src: p.video.poster, width: 800, format: 'webp' }).then((img) => [p.id, img.src] as const)] : [],
+    ),
+  ),
+);
 
 const groups = categories
   .map((c) => {
@@ -89,21 +99,44 @@ const filters = [
                 data-selected={p.selected ? '' : undefined}
               >
                 <div class="p-id">
-                  <p class="meta">{p.topic}</p>
+                  <p class="meta">
+                    {p.topic}
+                    {p.note && <span class="card-note"> · {p.note}</span>}
+                  </p>
                   <h4 class="serif" id={`project-${p.id}`}>
                     {p.name}
                   </h4>
                   <p class="p-tagline">{p.tagline}</p>
                   {p.outcome && <p class="p-outcome">{p.outcome}</p>}
                   <ProjectLinks links={p.links} projectName={p.name} />
-                  {p.screenshot && (
-                    <Image
-                      src={p.screenshot.src}
-                      alt={p.screenshot.alt}
-                      widths={[400, 800]}
-                      sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1080px) 45vw, 320px"
-                      class="shot"
-                    />
+                  {p.video ? (
+                    <figure class="demo">
+                      <video
+                        class="shot"
+                        src={withBase(p.video.src)}
+                        poster={posters.get(p.id)}
+                        width="1280"
+                        height="800"
+                        aria-label={p.video.label}
+                        muted
+                        loop
+                        playsinline
+                        controls
+                        preload="none"
+                        data-autoplay
+                      />
+                      <figcaption class="demo-caption">{p.video.caption}</figcaption>
+                    </figure>
+                  ) : (
+                    p.screenshot && (
+                      <Image
+                        src={p.screenshot.src}
+                        alt={p.screenshot.alt}
+                        widths={[400, 800]}
+                        sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1080px) 45vw, 320px"
+                        class="shot"
+                      />
+                    )
                   )}
                 </div>
 
@@ -178,6 +211,7 @@ const filters = [
                   </h4>
                   <p class="p-tagline">{p.tagline}</p>
                   <p class="p-text card-summary">{p.summary}</p>
+                  {p.outcome && <p class="p-outcome">{p.outcome}</p>}
                   {p.stack && (
                     <p class="stack card-stack">
                       <span class="stack-label">Stack</span>
@@ -386,6 +420,21 @@ const filters = [
     background: var(--surface);
   }
 
+  .demo {
+    margin-top: var(--s-5);
+  }
+
+  .demo .shot {
+    margin-top: 0;
+    background: #1a0b16;
+  }
+
+  .demo-caption {
+    margin-top: var(--s-2);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
   .project :global(.shot) {
     margin-top: var(--s-5);
     border: 1px solid var(--rule);
@@ -435,6 +484,10 @@ const filters = [
 
   .card-note {
     color: var(--ink-2);
+  }
+
+  .card .p-outcome {
+    margin-top: var(--s-3);
   }
 
   .card-summary {

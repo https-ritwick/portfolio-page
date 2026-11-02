@@ -1,6 +1,8 @@
 ---
 import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
 import { achievements } from '../../data/achievements';
+import { withBase } from '../../utils/url';
 ---
 
 <section class="section" id="awards" aria-labelledby="awards-title">
@@ -17,6 +19,14 @@ import { achievements } from '../../data/achievements';
               {a.note && <span class="a-note"> · {a.note}</span>}
             </p>
             {a.organizer && <p class="a-org">{a.organizer}</p>}
+            {a.certificate && (
+              <a class="icon-link a-cert" href={withBase(a.certificate)} target="_blank" rel="noopener">
+                <Icon name="file-text" size={15} />
+                <span>View certificate (PDF)</span>
+                <Icon name="arrow-up-right" size={13} class="i-ext" />
+                <span class="sr-only"> for {a.event} (opens in a new tab)</span>
+              </a>
+            )}
           </li>
         ))
       }
@@ -67,6 +77,11 @@ import { achievements } from '../../data/achievements';
     margin-top: var(--s-1);
     font-size: var(--fs-sm);
     color: var(--ink-3);
+  }
+
+  .a-cert {
+    margin-top: var(--s-2);
+    font-size: var(--fs-sm);
   }
 
   @media (max-width: 860px) {

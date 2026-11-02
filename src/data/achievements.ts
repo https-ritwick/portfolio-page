@@ -9,6 +9,8 @@ export interface Achievement {
   organizer?: string;
   tier: 'major' | 'standard';
   note?: string;
+  /** Path under public/, e.g. 'certificates/x.pdf'. */
+  certificate?: string;
 }
 
 export const achievements: Achievement[] = [
@@ -35,6 +37,8 @@ export const achievements: Achievement[] = [
     event: 'ETAAV Challenge 2025',
     organizer: 'IISc Bangalore',
     tier: 'standard',
+    note: 'UAV EO-IR slant-angle object detection',
+    certificate: 'certificates/etaav-2025-third-place.pdf',
   },
   {
     placement: '3rd Place',
