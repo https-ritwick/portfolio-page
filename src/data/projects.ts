@@ -6,7 +6,13 @@
  *
  * Links: only add URLs that exist — every link is shown as-is.
  * `diagram` (optional) adds an expandable architecture schematic.
+ * `screenshot` (optional) shows a real screenshot of the project. Put the file in
+ * src/assets/projects/ and import it below; Astro resizes and compresses it at build.
  */
+
+import type { ImageMetadata } from 'astro';
+import riffleShot from '../assets/projects/riffle.webp';
+import efestShot from '../assets/projects/efest.webp';
 
 export type DiagramKind = 'agents' | 'fusion' | 'fog';
 export type CategoryId = 'ai' | 'campus' | 'games';
@@ -33,6 +39,8 @@ interface BaseProject {
   note?: string;
   /** Shown in the default "Selected" view of the projects filter. */
   selected?: boolean;
+  /** A real screenshot of the project; `alt` describes what it shows. */
+  screenshot?: { src: ImageMetadata; alt: string };
 }
 
 export interface FullProject extends BaseProject {
@@ -196,6 +204,10 @@ export const projects: Project[] = [
     summary:
       'Official site for Elysian (USAR’s technical fest) and Synesthesia (USDI’s design fest), held 21–23 October 2026. It covers technical, design, cultural and Garba events, plus schedules, clubs, team, volunteer sign-up, sponsors, announcements and FAQs. Registration links out to each event’s official platform.',
     stack: ['React', 'Motion', 'Cloudflare Workers'],
+    screenshot: {
+      src: efestShot,
+      alt: 'Home page of the Elysian × Synesthesia fest site: the university name above the two fest logos on a starry background.',
+    },
     links: [{ kind: 'live', href: 'https://fests.ggsipuedc.workers.dev/' }],
   },
 
@@ -233,6 +245,10 @@ export const projects: Project[] = [
       'Voice chat over WebRTC with a WebSocket fallback, and Google sign-in groups with shared leaderboards',
     ],
     stack: ['TypeScript', 'React', 'Cloudflare Workers', 'Durable Objects', 'D1', 'WebRTC', 'Gemini API', 'Playwright'],
+    screenshot: {
+      src: riffleShot,
+      alt: 'Riffle home page: “Name the song before your friends do”, with Create a game, Play solo and Join with a code options.',
+    },
     links: [
       { kind: 'play', href: 'https://riffle.musicquiz.workers.dev' },
       { kind: 'source', href: 'https://github.com/https-ritwick/Riffle-Guess-the-Song' },

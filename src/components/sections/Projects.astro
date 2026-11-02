@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import SectionHead from '../SectionHead.astro';
 import Icon from '../Icon.astro';
 import ProjectLinks from '../ProjectLinks.astro';
@@ -95,6 +96,15 @@ const filters = [
                   <p class="p-tagline">{p.tagline}</p>
                   {p.outcome && <p class="p-outcome">{p.outcome}</p>}
                   <ProjectLinks links={p.links} projectName={p.name} />
+                  {p.screenshot && (
+                    <Image
+                      src={p.screenshot.src}
+                      alt={p.screenshot.alt}
+                      widths={[400, 800]}
+                      sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1080px) 45vw, 320px"
+                      class="shot"
+                    />
+                  )}
                 </div>
 
                 <div class="p-detail">
@@ -150,6 +160,15 @@ const filters = [
                   data-project={p.categoryId}
                   data-selected={p.selected ? '' : undefined}
                 >
+                  {p.screenshot && (
+                    <Image
+                      src={p.screenshot.src}
+                      alt={p.screenshot.alt}
+                      widths={[560, 1100]}
+                      sizes="(max-width: 680px) calc(100vw - 2.5rem), 540px"
+                      class="shot card-shot"
+                    />
+                  )}
                   <p class="meta">
                     {p.topic}
                     {p.note && <span class="card-note"> · {p.note}</span>}
@@ -355,6 +374,25 @@ const filters = [
     color: var(--ink-3);
   }
 
+  /* Screenshots: fixed ratio, anchored to the top of the page they show. */
+  .project :global(.shot),
+  .card :global(.shot) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    background: var(--surface);
+  }
+
+  .project :global(.shot) {
+    margin-top: var(--s-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 24px -20px rgb(0 0 0 / 0.45);
+  }
+
   .p-arch {
     grid-column: 2 / -1;
     margin-top: calc(var(--s-2) * -1);
@@ -386,6 +424,15 @@ const filters = [
     font-size: var(--fs-md);
   }
 
+  /* Bleeds to the card edges, above the text. */
+  .card :global(.card-shot) {
+    width: calc(100% + 2 * var(--s-5));
+    max-width: none;
+    margin: calc(var(--s-5) * -1) calc(var(--s-5) * -1) var(--s-5);
+    border-bottom: 1px solid var(--rule);
+    border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  }
+
   .card-note {
     color: var(--ink-2);
   }
@@ -396,6 +443,12 @@ const filters = [
 
   .card-stack {
     margin-top: var(--s-3);
+  }
+
+  /* Beside a card with a screenshot, a text-only card keeps its natural height
+     instead of stretching into a mostly empty box. */
+  .cards:has(:global(.card-shot)) .card:not(:has(:global(.card-shot))) {
+    align-self: start;
   }
 
   /* Push links to the bottom so cards in a row align. */

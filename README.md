@@ -188,6 +188,7 @@ All content is in `src/data/*.ts`. Components read from it, so you rarely touch 
   Set `selected: true` to include it in the default "Selected" filter view.
   Links are a list of `{ kind: 'source' | 'live' | 'play' | 'paper', href }`; only add URLs that exist.
   For a schematic, set `diagram` (add new ones in `components/diagrams/` and register them in `Projects.astro`).
+  For a screenshot, save it in `src/assets/projects/` (a 16:10 crop of the top of the page works best, about 1600px wide), import it at the top of `projects.ts` and set `screenshot: { src, alt }`. Astro resizes and compresses it at build.
 - **New talk / paper / award:** `talks.ts` (put certificates in `public/certificates/` and set `certificate`), `publications.ts`, `achievements.ts` (`tier: 'major'` is highlighted).
 - **Leadership:** `leadership.ts` (`description` is optional).
 - **Skills:** `skills.ts`.
