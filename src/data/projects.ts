@@ -19,6 +19,8 @@ import bloomShot from '../assets/projects/bloom.webp';
 import wasteguardShot from '../assets/projects/wasteguard.webp';
 import batchShot from '../assets/projects/batch.webp';
 import hostelShot from '../assets/projects/hostel.webp';
+import fusionShot from '../assets/projects/fusion.webp';
+import iotfogShot from '../assets/projects/iotfog.webp';
 
 export type DiagramKind = 'agents' | 'fusion' | 'fog';
 export type CategoryId = 'ai' | 'campus' | 'games';
@@ -45,8 +47,11 @@ interface BaseProject {
   note?: string;
   /** Shown in the default "Selected" view of the projects filter. */
   selected?: boolean;
-  /** A real screenshot of the project; `alt` describes what it shows. */
-  screenshot?: { src: ImageMetadata; alt: string };
+  /**
+   * A real screenshot of the project; `alt` describes what it shows.
+   * `full` (a path under public/) links the thumbnail to a full-size version.
+   */
+  screenshot?: { src: ImageMetadata; alt: string; full?: string };
   /** Short muted demo clip. `src` is a path under public/; `label` describes it. */
   video?: { src: string; poster: ImageMetadata; label: string; caption: string };
 }
@@ -116,19 +121,25 @@ export const projects: Project[] = [
     detail: 'full',
     categoryId: 'ai',
     name: 'FusionSight-YOLO',
-    tagline: 'Object detection in UAV imagery with multi-channel input fusion',
+    tagline: 'Real-time UAV object detection from fused electro-optical and infrared imagery',
     topic: 'Computer vision · Research',
     problem:
-      'Aerial imagery from UAVs has small targets and shifting viewpoints and conditions, so robust detection for real-time monitoring and transport safety is hard.',
+      'Drone imagery has small, occluded objects under changing light, day and night. Electro-optical (EO) cameras lose detail in low light and glare, infrared (IR) loses fine structure, and standard detectors only accept 3-channel RGB, so they can’t use both.',
     approach:
-      'Modified the YOLOv8 architecture to fuse multiple input channels at the network input, then trained and evaluated it on UAV data.',
+      'Early fusion: each EO frame is stacked with its paired IR frame into one 6-channel tensor, and YOLOv8x is modified to take it. Built for the ETAAV EO-IR challenge (IISc), on slant-angle drone footage of Bengaluru roads.',
     built: [
-      'Multi-channel input fusion in a modified YOLOv8',
-      'Training and evaluation on UAV imagery',
+      'YOLOv8x first convolution widened to 6 input channels, initialised from averaged pretrained RGB weights',
+      'Paired EO-IR pipeline: IR replicated to 3 channels, SAGA grey-colour augmentation, YOLO-format labels',
+      'Two-stage training from pretrained YOLOv8x weights to a fine-tuned final model',
+      'Validated on IndraEye, LLVIP (15,488 pairs) and M3FD (4,200 pairs); beats baseline YOLOv8x on all three',
       'Lead author of the published paper',
     ],
-    stack: ['YOLOv8', 'Deep learning', 'Computer vision'],
-    outcome: 'Published at ETAAV 2025, IISc Bangalore (IEEE Xplore)',
+    stack: ['YOLOv8x', 'PyTorch', 'Ultralytics', 'EO-IR fusion', 'Computer vision'],
+    outcome: 'Published at ETAAV 2025, IISc Bangalore (IEEE Xplore) · 3rd place, EO-IR detection challenge',
+    screenshot: {
+      src: fusionShot,
+      alt: 'FusionSight-YOLO detections on paired EO and IR drone frames from the IndraEye and M3FD datasets, with labelled bounding boxes on cars, trucks, people and auto-rickshaws.',
+    },
     links: [
       { kind: 'source', href: 'https://github.com/https-ritwick/IndraEye_Labels' },
       { kind: 'paper', href: 'https://ieeexplore.ieee.org/document/11213298' },
@@ -137,6 +148,7 @@ export const projects: Project[] = [
   },
   {
     id: 'iotfog',
+    selected: true,
     detail: 'full',
     categoryId: 'ai',
     name: 'IoT-Fog Health Monitoring',
@@ -144,13 +156,19 @@ export const projects: Project[] = [
     topic: 'Machine learning · Distributed systems',
     problem: 'Routing every vital-sign reading through the cloud adds latency where medical monitoring can least afford it.',
     approach:
-      'A three-tier edge, fog and cloud architecture that processes data close to the patient, with predictive models running on real-time health data.',
+      'Layered edge, fog and cloud design. Raspberry Pi fog nodes filter and analyse readings next to the patient and raise immediate alerts; the cloud stores history and runs the prediction models, which feed dashboards for patients, caregivers and doctors.',
     built: [
-      'Distributed edge–fog–cloud architecture for low-latency monitoring',
-      'Scikit-learn models for diabetes and heart-disease prediction',
-      'Real-time health-data processing and predictive analytics',
+      'Data collection from sensors (ECG, pulse, glucose, blood pressure) plus user inputs such as age, HbA1c and family history',
+      'Fog layer on Raspberry Pi in Python: filtering, preprocessing, local storage and instant health alerts',
+      'Scikit-learn models for heart-disease and diabetes prediction, with the algorithm choice informed by published benchmarks',
+      'Mobile app, web dashboard and REST API for remote monitoring and recommendations',
     ],
-    stack: ['Scikit-learn', 'Edge & fog computing', 'Google Cloud'],
+    stack: ['Python', 'Scikit-learn', 'Raspberry Pi', 'Fog computing', 'Google Cloud', 'REST API'],
+    screenshot: {
+      src: iotfogShot,
+      alt: 'Block diagram of the IoT-Fog healthcare system: fog computing layer, cloud servers and a machine-learning layer for heart-disease and diabetes prediction.',
+      full: 'diagrams/iot-fog-block-diagram.webp',
+    },
     links: [],
     diagram: 'fog',
   },
@@ -191,7 +209,6 @@ export const projects: Project[] = [
   /* --------------------------------------------------- Campus & university */
   {
     id: 'batch',
-    selected: true,
     detail: 'full',
     categoryId: 'campus',
     name: 'Batch Allotment & Reporting System',

@@ -128,7 +128,22 @@ const filters = [
                       <figcaption class="demo-caption">{p.video.caption}</figcaption>
                     </figure>
                   ) : (
-                    p.screenshot && (
+                    p.screenshot &&
+                    (p.screenshot.full ? (
+                      <a class="shot-link" href={withBase(p.screenshot.full)} target="_blank" rel="noopener">
+                        <Image
+                          src={p.screenshot.src}
+                          alt={p.screenshot.alt}
+                          widths={[400, 800]}
+                          sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1080px) 45vw, 320px"
+                          class="shot"
+                        />
+                        <span class="shot-hint">
+                          View full size <Icon name="arrow-up-right" size={13} />
+                          <span class="sr-only"> (opens in a new tab)</span>
+                        </span>
+                      </a>
+                    ) : (
                       <Image
                         src={p.screenshot.src}
                         alt={p.screenshot.alt}
@@ -136,7 +151,7 @@ const filters = [
                         sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1080px) 45vw, 320px"
                         class="shot"
                       />
-                    )
+                    ))
                   )}
                 </div>
 
@@ -422,6 +437,23 @@ const filters = [
 
   .demo {
     margin-top: var(--s-5);
+  }
+
+  .shot-link {
+    display: block;
+    color: var(--ink-3);
+  }
+
+  .shot-link:hover {
+    color: var(--accent);
+  }
+
+  .shot-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: var(--s-2);
+    font-size: var(--fs-xs);
   }
 
   .demo .shot {
